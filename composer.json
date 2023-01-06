@@ -1,0 +1,42 @@
+{
+    "name": "oromedialab/nxcorebundle",
+    "license": "proprietary",
+    "private": true,
+    "version": "0.0.1",
+    "type": "symfony-bundle",
+    "description": "Nx Core Bundle",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Ibrahim Azhar Armar",
+            "email": "ibrahim.azhar@oromedialab.com",
+            "homepage": "https://oromedialab.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "OroMediaLab\\NxCoreBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OroMediaLab\\NxCoreBundle\\Tests\\": "tests/"
+        },
+        "exclude-from-classmap": [
+            "/tests/"
+        ]
+    },
+    "require": {
+        "php": ">=8.1",
+        "symfony/orm-pack": "^2.2.0",
+        "knplabs/doctrine-behaviors": "^2.0.8",
+        "symfony/security-bundle": "^6.2",
+        "symfony/framework-bundle": "^6.2",
+        "symfony/yaml": "^6.2",
+        "symfony/dotenv": "6.3.x-dev"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^6.2",
+        "dama/doctrine-test-bundle": "^7.1"
+    }
+}
