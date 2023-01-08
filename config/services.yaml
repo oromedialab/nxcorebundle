@@ -1,6 +1,6 @@
 services:
-    nxcore.controller.account_controller:
-        class: 'OroMediaLab\NxCoreBundle\Controller\AccountController'
+    nxcore.controller.v1.account_controller:
+        class: 'OroMediaLab\NxCoreBundle\Controller\V1\AccountController'
         tags: ['controller.service_arguments']
         calls:
             - ['setContainer', ['@service_container']]

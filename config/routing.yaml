@@ -1,4 +1,4 @@
-nxcore_route_authenticate:
-    path: /account/authenticate
-    controller: nxcore.controller.account_controller::authenticate
+nxcore.routes.api_v1_account_authenticate:
+    path: /api/v1/account/authenticate
+    controller: nxcore.controller.v1.account_controller::authenticate
     methods: POST

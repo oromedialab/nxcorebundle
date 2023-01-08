@@ -1,6 +1,6 @@
 <?php
 
-namespace OroMediaLab\NxCoreBundle\Controller;
+namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
