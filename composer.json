@@ -15,7 +15,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "OroMediaLab\\NxCoreBundle\\": "src/"
+            "OroMediaLab\\NxCoreBundle\\": "src/",
+            "OroMediaLab\\NxCoreBundle\\Config\\": "config/"
         }
     },
     "autoload-dev": {
