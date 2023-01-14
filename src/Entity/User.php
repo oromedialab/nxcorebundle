@@ -10,10 +10,11 @@ use Knp\DoctrineBehaviors\Model\Uuidable\UuidableTrait;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity()]
 #[ORM\Table(name: "user")]
-class User implements UuidableInterface, TimestampableInterface, PasswordAuthenticatedUserInterface
+class User implements UuidableInterface, TimestampableInterface, PasswordAuthenticatedUserInterface, UserInterface
 {
     use UuidableTrait;
     use TimestampableTrait;
@@ -23,13 +24,16 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(type: 'string', length: 50, unique: true, nullable: false)]
     private string $username;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     private string $password;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(type: 'json')]
+    private $roles = [];
+
+    #[ORM\Column(length: 50, nullable: false)]
     private string $name;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -46,7 +50,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->id;
     }
 
-    public function setUsername(string $username): User
+    public function setUsername(string $username): self
     {
         $this->username = $username;
         return $this;
@@ -57,7 +61,12 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->username;
     }
 
-    public function setPassword(string $password): User
+    public function getUserIdentifier(): string
+    {
+        return (string)$this->username;
+    }
+
+    public function setPassword(string $password): self
     {
         $this->password = $password;
         return $this;
@@ -68,7 +77,20 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->password;
     }
 
-    public function setName(string $name): User
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->roles = [$role];
+        return $this;
+    }
+
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -79,7 +101,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->name;
     }
 
-    public function setEmailAddress(string $emailAddress): User
+    public function setEmailAddress(string $emailAddress): self
     {
         $this->emailAddress = $emailAddress;
         return $this;
@@ -90,7 +112,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->emailAddress;
     }
 
-    public function setContactNumber(string $contactNumber): User
+    public function setContactNumber(string $contactNumber): self
     {
         $this->contactNumber = $contactNumber;
         return $this;
@@ -101,7 +123,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->contactNumber;
     }
 
-    public function setEnabled(bool $enabled): User
+    public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
         return $this;
@@ -110,5 +132,10 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     public function isEnabled(): bool
     {
         return $this->enabled;
+    }
+
+    public function eraseCredentials()
+    {
+
     }
 }

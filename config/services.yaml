@@ -1,6 +1,29 @@
 services:
     nxcore.controller.v1.account_controller:
-        class: 'OroMediaLab\NxCoreBundle\Controller\V1\AccountController'
+        class: OroMediaLab\NxCoreBundle\Controller\V1\AccountController
         tags: ['controller.service_arguments']
         calls:
             - ['setContainer', ['@service_container']]
+    nxcore.eventsubscriber.request_data:
+        class: OroMediaLab\NxCoreBundle\EventSubscriber\RequestDataSubscriber
+        tags: [kernel.event_subscriber]
+        autowire: true
+        autoconfigure: true
+    nxcore.eventsubscriber.request_validation:
+        class: OroMediaLab\NxCoreBundle\EventSubscriber\RequestValidationSubscriber
+        tags: [kernel.event_subscriber]
+        autowire: true
+        autoconfigure: true
+    nxcore.eventlistener.authentication_failure:
+        class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationResponseListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onFailure }
+    nxcore.eventlistener.authentication_success:
+        class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationResponseListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onSuccess }
+    nxcore.command.user_create:
+        class: OroMediaLab\NxCoreBundle\Command\UserCreateCommand
+        autowire: true
+        tags:
+            - { name: 'console.command', command: 'app:user:create' }

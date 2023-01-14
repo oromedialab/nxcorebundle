@@ -48,7 +48,7 @@ class Country implements UuidableInterface, TimestampableInterface, Translatable
         return $this->id;
     }
 
-    public function setAlpha2Code(string $alpha2Code): Country
+    public function setAlpha2Code(string $alpha2Code): self
     {
         $this->alpha2Code = $alpha2Code;
         return $this;
@@ -59,7 +59,7 @@ class Country implements UuidableInterface, TimestampableInterface, Translatable
         return $this->alpha2Code;
     }
 
-    public function setAlpha3Code(string $alpha3Code): Country
+    public function setAlpha3Code(string $alpha3Code): self
     {
         $this->alpha3Code = $alpha3Code;
         return $this;
@@ -70,7 +70,7 @@ class Country implements UuidableInterface, TimestampableInterface, Translatable
         return $this->alpha3Code;
     }
 
-    public function setCurrency(string $currency): Country
+    public function setCurrency(string $currency): self
     {
         $this->currency = $currency;
         return $this;
@@ -81,7 +81,7 @@ class Country implements UuidableInterface, TimestampableInterface, Translatable
         return $this->currency;
     }
 
-    public function setCallingCode(string $callingCode): Country
+    public function setCallingCode(string $callingCode): self
     {
         $this->callingCode = $callingCode;
         return $this;
@@ -92,7 +92,7 @@ class Country implements UuidableInterface, TimestampableInterface, Translatable
         return $this->callingCode;
     }
 
-    public function setFlag(string $flag): Country
+    public function setFlag(string $flag): self
     {
         $this->flag = $flag;
         return $this;
@@ -103,7 +103,7 @@ class Country implements UuidableInterface, TimestampableInterface, Translatable
         return $this->flag;
     }
 
-    public function setSlug(string $slug): Country
+    public function setSlug(string $slug): self
     {
         $this->slug = $slug;
         return $this;
