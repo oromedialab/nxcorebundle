@@ -9,13 +9,17 @@ class ApiResponse extends JsonResponse
 {
     public function __construct(ApiResponseCode $apiResponseCode, array $payload = [])
     {
+        parent::__construct(static::body($apiResponseCode, $payload), $apiResponseCode->httpStatusCode());
+    }
+
+    public static function body(ApiResponseCode $apiResponseCode, array $payload = array())
+    {
         $now = new \DateTime();
-        $responseData = [
+        return [
             'response_code' => $apiResponseCode->value,
             'http_status_code' => $apiResponseCode->httpStatusCode(),
             'timestamp' => $now->format(\DateTime::RFC3339),
             'payload' => $payload
         ];
-        parent::__construct($responseData, $apiResponseCode->httpStatusCode());
     }
 }

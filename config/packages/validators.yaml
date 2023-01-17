@@ -1,0 +1,15 @@
+nxcore:
+    validators:
+        namespaces:
+            - { name: 'Assert', class: Symfony\Component\Validator\Constraints }
+            - { name: 'CustomAssert', class: App\Validator\Constraints }
+        templates:
+            - { name: 'NotEmpty', class: CustomAssert\NotEmpty }
+        routes:
+            - {
+                route: 'nxcore.routes.api_v1_account_authenticate',
+                validators: [
+                    { field: 'username', required: true, constraint: 'NotEmpty' },
+                    { field: 'password', required: true, constraint: 'NotEmpty' }
+                ]   
+            }

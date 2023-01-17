@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class RequestValidationSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             KernelEvents::CONTROLLER => 'validate',
@@ -19,5 +19,6 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $routeName = $request->get('_route');
         $data = !empty($request->request->all()) ? $request->request->all() : array();
+        $routeName = $request->get('_route');
     }
 }
