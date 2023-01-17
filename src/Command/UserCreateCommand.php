@@ -32,7 +32,7 @@ class UserCreateCommand extends Command
         // User Role
         $question = new ChoiceQuestion(
             'Select User Role',
-            ['ADMIN'],
+            ['ROLE_ADMIN'],
             0
         );
         $role = $helper->ask($input, $output, $question);

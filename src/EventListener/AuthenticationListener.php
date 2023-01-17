@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use OroMediaLab\NxCoreBundle\Utils\ApiResponse;
 use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
 
-class AuthenticationResponseListener
+class AuthenticationListener
 {
     public function onFailure(AuthenticationFailureEvent $event)
     {
