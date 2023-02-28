@@ -35,7 +35,9 @@
         "symfony/framework-bundle": "^6.2",
         "symfony/yaml": "^6.2",
         "symfony/dotenv": "^6.2",
-        "lexik/jwt-authentication-bundle": "^2.16"
+        "lexik/jwt-authentication-bundle": "^2.16",
+        "aws/aws-sdk-php": "^3.258",
+        "symfony/mime": "^6.2"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^6.2",

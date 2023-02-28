@@ -2,3 +2,23 @@ nxcore.routes.api_v1_account_authenticate:
     path: /api/v1/account/authenticate
     controller: nxcore.controller.v1.account_controller::authenticate
     methods: POST
+nxcore.routes.api_v1_user_create:
+    path: /api/v1/user
+    controller: nxcore.controller.v1.user_controller::save
+    methods: POST
+nxcore.routes.api_v1_user_update:
+    path: /api/v1/user
+    controller: nxcore.controller.v1.user_controller::update
+    methods: PUT
+nxcore.routes.api_v1_user_fetch:
+    path: /api/v1/user
+    controller: nxcore.controller.v1.user_controller::index
+    methods: GET
+nxcore.routes.api_v1_user_delete:
+    path: /api/v1/user
+    controller: nxcore.controller.v1.user_controller::delete
+    methods: DELETE
+nxcore.routes.api_v1_file_upload:
+    path: /api/v1/file-upload
+    controller: nxcore.controller.v1.file_upload_controller::upload
+    methods: POST

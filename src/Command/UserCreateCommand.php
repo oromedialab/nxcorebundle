@@ -11,6 +11,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OroMediaLab\NxCoreBundle\Entity\User;
+use OroMediaLab\NxCoreBundle\Entity\UserAdmin;
 
 #[AsCommand(name: 'app:user:create')]
 class UserCreateCommand extends Command
@@ -39,7 +40,7 @@ class UserCreateCommand extends Command
         // Username
         $question = new Question('Username: ');
         $question->setValidator(function ($answer) {
-            if (!preg_match('/^[a-z][a-z0-9]{3,19}$/', $answer)) {
+            if (!preg_match('/^[a-zA-Z0-9.@][a-zA-Z0-9.@]{3,19}$/', $answer)) {
                 throw new \RuntimeException(
                     'Username must be all lowercase, start with a letter, must contain letter and numbers only, must be between 4-20 characters'
                 );
@@ -98,7 +99,7 @@ class UserCreateCommand extends Command
         });
         $contactNumber = $helper->ask($input, $output, $question);
         // User Entity
-        $user = new User();
+        $user = new UserAdmin();
         $user->setRole($role);
         $user->setUsername($username);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));

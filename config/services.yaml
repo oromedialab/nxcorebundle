@@ -13,19 +13,30 @@ services:
         tags: ['controller.service_arguments']
         calls:
             - ['setContainer', ['@service_container']]
-    nxcore.eventlistener.authentication_failure:
+    nxcore.controller.v1.user_controller:
+        class: OroMediaLab\NxCoreBundle\Controller\V1\UserController
+        tags: ['controller.service_arguments']
+        calls:
+            - ['setContainer', ['@service_container']]
+    nxcore.controller.v1.file_upload_controller:
+        class: OroMediaLab\NxCoreBundle\Controller\V1\FileUploadController
+        tags: ['controller.service_arguments']
+        calls:
+            - ['setContainer', ['@service_container']]
+    nxcore.eventlistener.authentication:
         class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onFailure }
-    nxcore.eventlistener.authentication_success:
-        class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationListener
-        tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onSuccess }
-    nxcore.eventlistener.authentication_jwt_not_found:
-        class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationListener
-        tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onJWTNotFound }
     nxcore.command.user_create:
         class: OroMediaLab\NxCoreBundle\Command\UserCreateCommand
         tags:
             - { name: 'console.command', command: 'app:user:create' }
+    nxcore.eventlistener.cors:
+        class: OroMediaLab\NxCoreBundle\EventListener\CorsListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+    OroMediaLab\NxCoreBundle\Repository\UserRepository:
+        tags:
+            - { name: doctrine.repository_service }

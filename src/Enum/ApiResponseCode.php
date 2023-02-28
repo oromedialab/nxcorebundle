@@ -14,6 +14,9 @@ enum ApiResponseCode: string
     case RESOURCE_UPDATED = 'resource_updated';
     case RESOURCE_DELETED = 'resource_deleted';
     case NOT_FOUND = 'not_found';
+    case DUPLICATE_RESOURCE = 'duplicate_resource';
+    case FILE_NOT_UPLOADED = 'file_not_uploaded';
+    case FILE_UPLOADED = 'file_uploaded';
 
     public function httpStatusCode(): int
     {
@@ -26,7 +29,10 @@ enum ApiResponseCode: string
             self::RESOURCE_CREATED => JsonResponse::HTTP_CREATED,
             self::RESOURCE_UPDATED => JsonResponse::HTTP_OK,
             self::RESOURCE_DELETED => JsonResponse::HTTP_OK,
-            self::NOT_FOUND => JsonResponse::HTTP_NOT_FOUND
+            self::NOT_FOUND => JsonResponse::HTTP_NOT_FOUND,
+            self::DUPLICATE_RESOURCE => JsonResponse::HTTP_CONFLICT,
+            self::FILE_NOT_UPLOADED => JsonResponse::HTTP_BAD_REQUEST,
+            self::FILE_UPLOADED => JsonResponse::HTTP_OK
         };
     }
 }

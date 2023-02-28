@@ -11,9 +11,12 @@ use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use OroMediaLab\NxCoreBundle\Repository\UserRepository;
 
-#[ORM\Entity()]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "user")]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
 class User implements UuidableInterface, TimestampableInterface, PasswordAuthenticatedUserInterface, UserInterface
 {
     use UuidableTrait;
@@ -30,8 +33,8 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     #[ORM\Column(length: 100, nullable: true)]
     private string $password;
 
-    #[ORM\Column(type: 'json')]
-    private $roles = [];
+    #[ORM\Column(type: 'string')]
+    protected $role;
 
     #[ORM\Column(length: 50, nullable: false)]
     private string $name;
@@ -79,11 +82,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        if (empty($roles)) {
-            $roles[] = 'ROLE_USER';
-        }
-        return array_unique($roles);
+        return [$this->role];
     }
 
     public function setRole(string $role): self
