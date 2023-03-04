@@ -29,7 +29,7 @@ class AuthenticationListener
                 $event->getData()['token'], // cookie value
                 time() + 3155695200,
                 '/', // path
-                '.screenfixer.in', // domain, null means that Symfony will generate it on its own.
+                '.screenfixer.in,localhost', // domain, null means that Symfony will generate it on its own.
                 true, // secure
                 true, // httpOnly
                 false, // raw
