@@ -45,7 +45,7 @@ class FileUploadController extends AbstractController
         $fileNameWithoutExtension = Common::generateRandomString(rand(36, 64));
         $fileExtension = $file->guessExtension();
         $fileName = $fileNameWithoutExtension.'.'.$fileExtension;
-        $fileNameWithBaseDir = '/'.$year.'/'.$month.'/'.$fileName;
+        $fileNameWithBaseDir = $year.'/'.$month.'/'.$fileName;
         if (true === $isDev) {
             $fileNameWithBaseDir = 'dev/'.$fileNameWithBaseDir;
         }
@@ -62,7 +62,7 @@ class FileUploadController extends AbstractController
         return new ApiResponse(ApiResponseCode::FILE_UPLOADED, [
             'base_url' => $cdnEndpoint,
             'files' => array(
-                'file' => $fileNameWithBaseDir
+                'file' => '/'.$fileNameWithBaseDir
             )
         ]);
     }
