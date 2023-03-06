@@ -39,15 +39,20 @@ class FileUploadController extends AbstractController
                 'secret' => $secretKey,
             ]
         ]);
-        
-        $spaceName = 'cosko';
+
+        $year = date('Y', strtotime('now'));
+        $month = date('m', strtotime('now'));
         $fileNameWithoutExtension = Common::generateRandomString(rand(36, 64));
         $fileExtension = $file->guessExtension();
         $fileName = $fileNameWithoutExtension.'.'.$fileExtension;
+        $fileNameWithBaseDir = '/'.$year.'/'.$month.'/'.$fileName;
+        if (true === $isDev) {
+            $fileNameWithBaseDir = 'dev/'.$fileNameWithBaseDir;
+        }
         try {
             $s3->putObject([
-                'Bucket' => $spaceName,
-                'Key' => true === $isDev ? 'dev/'.$fileName : $fileName,
+                'Bucket' => 'cosko',
+                'Key' => $fileNameWithBaseDir,
                 'Body' => fopen($file->getPathname(), 'rb'),
                 'ACL' => 'public-read'
             ]);
@@ -57,7 +62,7 @@ class FileUploadController extends AbstractController
         return new ApiResponse(ApiResponseCode::FILE_UPLOADED, [
             'base_url' => $cdnEndpoint,
             'files' => array(
-                'file' => true === $isDev ? '/dev/'.$fileName : $fileName
+                'file' => $fileNameWithBaseDir
             )
         ]);
     }
