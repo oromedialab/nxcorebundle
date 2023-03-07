@@ -23,22 +23,10 @@ class AuthenticationListener
         if (!$user instanceof UserInterface) {
             return;
         }
-        $event->getResponse()->headers->setCookie(
-            new Cookie(
-                'JWT_AUTH', // Cookie name, should be the same as in config/packages/lexik_jwt_authentication.yaml.
-                $event->getData()['token'], // cookie value
-                time() + 3155695200,
-                '/', // path
-                '.screenfixer.in,localhost', // domain, null means that Symfony will generate it on its own.
-                true, // secure
-                true, // httpOnly
-                false, // raw
-                'lax' // same-site parameter, can be 'lax' or 'strict'.
-            )
-        );
         $data = [
             'name' => $user->getName(),
-            'role' => !empty($user->getRoles()[0]) ? $user->getRoles()[0] : 'ROLE_USER'
+            'role' => !empty($user->getRoles()[0]) ? $user->getRoles()[0] : 'ROLE_USER',
+            'jwt_token' => $event->getData()['token']
         ];
         $event->setData(ApiResponse::body(ApiResponseCode::AUTH_SUCCESSFUL, $data));
     }
