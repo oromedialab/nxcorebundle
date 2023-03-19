@@ -22,3 +22,7 @@ nxcore.routes.api_v1_file_upload:
     path: /api/v1/file-upload
     controller: nxcore.controller.v1.file_upload_controller::upload
     methods: POST
+nxcore.routes.api_v1_contact_message_send:
+    path: /api/v1/contact-message
+    controller: nxcore.controller.v1.contact_message_controller::send
+    methods: POST

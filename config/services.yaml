@@ -23,6 +23,11 @@ services:
         tags: ['controller.service_arguments']
         calls:
             - ['setContainer', ['@service_container']]
+    nxcore.controller.v1.contact_message_controller:
+        class: OroMediaLab\NxCoreBundle\Controller\V1\ContactMessageController
+        tags: ['controller.service_arguments']
+        calls:
+            - ['setContainer', ['@service_container']]
     nxcore.eventlistener.authentication:
         class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationListener
         tags:
