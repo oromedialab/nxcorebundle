@@ -59,9 +59,10 @@ class FileUploadController extends AbstractController
         } catch (AwsException $e) {
             throw new \Exception('Error uploading file: ' . $e->getMessage());
         }
+        $headers = get_headers($cdnEndpoint.'/'.$fileNameWithBaseDir, 1);
         return new ApiResponse(ApiResponseCode::FILE_UPLOADED, [
             'base_url' => $cdnEndpoint,
-            'mime_type' => mime_content_type($cdnEndpoint.'/'.$fileNameWithBaseDir),
+            'mime_type' => $headers['Content-Type'],
             'files' => array(
                 'file' => '/'.$fileNameWithBaseDir
             )
