@@ -59,17 +59,18 @@ class FileUploadController extends AbstractController
         } catch (AwsException $e) {
             throw new \Exception('Error uploading file: ' . $e->getMessage());
         }
-        $options = array(
-            'http' => array(
-              'method' => "GET",
-              'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36\r\n"
-            )
-          );
-        $context = stream_context_create($options);
-        $headers = get_headers($cdnEndpoint.'/'.$fileNameWithBaseDir, 1, $context);
+        // $options = array(
+        //     'http' => array(
+        //       'method' => "GET",
+        //       'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36\r\n"
+        //     )
+        //   );
+        // $context = stream_context_create($options);
+        // $headers = get_headers($cdnEndpoint.'/'.$fileNameWithBaseDir, 1, $context);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
         return new ApiResponse(ApiResponseCode::FILE_UPLOADED, [
             'base_url' => $cdnEndpoint,
-            'mime_type' => $headers['Content-Type'],
+            'mime_type' => $finfo->buffer(file_get_contents($cdnEndpoint.'/'.$fileNameWithBaseDir)),
             'files' => array(
                 'file' => '/'.$fileNameWithBaseDir
             )
