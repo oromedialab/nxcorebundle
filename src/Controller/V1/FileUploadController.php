@@ -61,6 +61,7 @@ class FileUploadController extends AbstractController
         }
         return new ApiResponse(ApiResponseCode::FILE_UPLOADED, [
             'base_url' => $cdnEndpoint,
+            'mime_type' => mime_content_type($cdnEndpoint.'/'.$fileNameWithBaseDir),
             'files' => array(
                 'file' => '/'.$fileNameWithBaseDir
             )
