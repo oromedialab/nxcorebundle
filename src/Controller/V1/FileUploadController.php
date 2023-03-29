@@ -67,7 +67,7 @@ class FileUploadController extends AbstractController
         //   );
         // $context = stream_context_create($options);
         // $headers = get_headers($cdnEndpoint.'/'.$fileNameWithBaseDir, 1, $context);
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         return new ApiResponse(ApiResponseCode::FILE_UPLOADED, [
             'base_url' => $cdnEndpoint,
             'mime_type' => $finfo->buffer(file_get_contents($cdnEndpoint.'/'.$fileNameWithBaseDir)),
