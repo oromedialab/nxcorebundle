@@ -45,3 +45,6 @@ services:
     OroMediaLab\NxCoreBundle\Repository\UserRepository:
         tags:
             - { name: doctrine.repository_service }
+    OroMediaLab\NxCoreBundle\Repository\KeyValueRepository:
+        tags:
+            - { name: doctrine.repository_service }
