@@ -22,7 +22,7 @@ class KeyValueRepository extends ServiceEntityRepository
             SELECT
                 key_value
             FROM
-                App:KeyValue key_value
+                OroMediaLab\NxCoreBundle\Entity\KeyValue key_value
             WHERE
                 key_value.keyName IN (:keys)
         ';
