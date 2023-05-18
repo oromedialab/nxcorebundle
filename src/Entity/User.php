@@ -87,7 +87,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
 
     public function setRole(string $role): self
     {
-        $this->roles = [$role];
+        $this->role = $role;
         return $this;
     }
 
