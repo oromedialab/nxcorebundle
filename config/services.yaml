@@ -28,6 +28,11 @@ services:
         tags: ['controller.service_arguments']
         calls:
             - ['setContainer', ['@service_container']]
+    nxcore.controller.v1.key_value_controller:
+        class: OroMediaLab\NxCoreBundle\Controller\V1\KeyValueController
+        tags: ['controller.service_arguments']
+        calls:
+            - ['setContainer', ['@service_container']]
     nxcore.eventlistener.authentication:
         class: OroMediaLab\NxCoreBundle\EventListener\AuthenticationListener
         tags:

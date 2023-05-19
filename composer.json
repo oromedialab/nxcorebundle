@@ -39,7 +39,8 @@
         "aws/aws-sdk-php": "^3.258",
         "symfony/mime": "^6.2",
         "symfony/google-mailer": "^6.2",
-        "symfony/mailer": "^6.2"
+        "symfony/mailer": "^6.2",
+        "phpoffice/phpspreadsheet": "dev-master"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^6.2",

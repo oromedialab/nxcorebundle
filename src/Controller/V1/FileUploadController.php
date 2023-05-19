@@ -2,7 +2,6 @@
 
 namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,11 +9,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use OroMediaLab\NxCoreBundle\Utils\ApiResponse;
 use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
 use OroMediaLab\NxCoreBundle\Entity\User;
+use OroMediaLab\NxCoreBundle\Utils\Common;
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
-use OroMediaLab\NxCoreBundle\Utils\Common;
 
-class FileUploadController extends AbstractController
+class FileUploadController extends BaseController
 {
     public function upload(Request $request, ManagerRegistry $doctrine): ApiResponse
     {

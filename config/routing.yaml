@@ -26,3 +26,19 @@ nxcore.routes.api_v1_contact_message_send:
     path: /api/v1/contact-message
     controller: nxcore.controller.v1.contact_message_controller::send
     methods: POST
+nxcore.routes.api_v1_key_value_create:
+    path: /api/v1/key-value
+    controller: nxcore.controller.v1.key_value_controller::save
+    methods: POST
+nxcore.routes.api_v1_key_value_update:
+    path: /api/v1/key-value
+    controller: nxcore.controller.v1.key_value_controller::update
+    methods: PUT
+nxcore.routes.api_v1_key_value_fetch:
+    path: /api/v1/key-value
+    controller: nxcore.controller.v1.key_value_controller::index
+    methods: GET
+nxcore.routes.api_v1_key_value_delete:
+    path: /api/v1/key-value
+    controller: nxcore.controller.v1.key_value_controller::delete
+    methods: DELETE

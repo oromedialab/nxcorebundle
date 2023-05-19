@@ -2,7 +2,6 @@
 
 namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +14,7 @@ use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
 use OroMediaLab\NxCoreBundle\Entity\ContactMessage;
 use OroMediaLab\NxCoreBundle\Entity\User;
 
-class ContactMessageController extends AbstractController
+class ContactMessageController extends BaseController
 {
     protected $config;
 

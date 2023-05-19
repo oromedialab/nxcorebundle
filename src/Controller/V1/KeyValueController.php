@@ -2,49 +2,49 @@
 
 namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
 use OroMediaLab\NxCoreBundle\Utils\ApiResponse;
 use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
+use OroMediaLab\NxCoreBundle\Entity\KeyValue;
 use OroMediaLab\NxCoreBundle\Entity\User;
 
-class UserController extends BaseController
+class KeyValueController extends BaseController
 {
-    public function save(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passwordHasher): ApiResponse
+    public function save(Request $request, ManagerRegistry $doctrine, #[CurrentUser] ?User $user): ApiResponse
     {
         $entityManager = $doctrine->getManager();
         $postData = $request->request->all();
         $uuid = !empty($postData['uuid']) ? $postData['uuid'] : null;
-        $isEdit = 'nxcore.routes.api_v1_user_update' === $request->get('_route');
-        $user = $request->get('user');
-        if (!empty($uuid) && true === $isEdit) {
-            $user = $doctrine->getRepository(User::class)->findOneBy(['uuid' => $uuid]);
-            if (!$user) {
+        $isEdit = 'api_v1_key_value_update' === $request->get('_route');
+        $keyValueEntity = null;
+        if (true === $isEdit) {
+            $keyValueEntity = $doctrine->getRepository(KeyValue::class)->findOneBy(['uuid' => $uuid]);
+            if (!$keyValueEntity) {
                 return new ApiResponse(ApiResponseCode::NOT_FOUND);
             }
         }
-        if (!$user) {
-            $user = new User;
-            $user->setRole($postData['role']);
+        if (!$keyValueEntity) {
+            $keyValueEntity = $doctrine->getRepository(KeyValue::class)->findOneBy(['keyName' => $postData['key']]);
+            if ($keyValueEntity) {
+                return new ApiResponse(ApiResponseCode::DUPLICATE_RESOURCE);
+            }
+            $keyValueEntity = new KeyValue();
         }
-        $user->setName($postData['name']);
-        $user->setEmailAddress($postData['email_address']);
-        $user->setUsername($postData['email_address']);
-        $user->setContactNumber($postData['contact_number']);
-        if (!empty($postData['password'])) {
-            $user->setPassword($passwordHasher->hashPassword($user, $postData['password']));
+        $keyValueEntity->setKeyName($postData['key']);
+        $keyValueEntity->setKeyValue($postData['value']);
+        if ($user) {
+            $keyValueEntity->setUser($user);
         }
-        $user->setEnabled($postData['enabled']);
-        $entityManager->persist($user);
+        $entityManager->persist($keyValueEntity);
         $entityManager->flush();
-        return new ApiResponse(true === $isEdit ? ApiResponseCode::RESOURCE_UPDATED : ApiResponseCode::RESOURCE_CREATED);
+        return new ApiResponse($isEdit ? ApiResponseCode::RESOURCE_UPDATED : ApiResponseCode::RESOURCE_CREATED);
     }
 
-    public function update(Request $request, ManagerRegistry $doctrine): Response
+    public function update(Request $request, ManagerRegistry $doctrine): ApiResponse
     {
-        return $this->forward('nxcore.controller.v1.user_controller::save', [
+        return $this->forward('App\Controller\Api\V1\KeyValueController::save', [
             'uuid' => $request->get('uuid'),
             '_route' => $request->attributes->get('_route'),
             '_route_params' => $request->attributes->get('_route_params')
@@ -55,7 +55,7 @@ class UserController extends BaseController
     {
         $entityManager = $doctrine->getManager();
         $params = $request->query->all();
-        $items = $doctrine->getRepository(User::class)->fetchAll([
+        $items = $doctrine->getRepository(KeyValue::class)->fetchAll([
             'filter' => $params
         ]);
         if (!empty($params['uuid']) && empty($items)) {
@@ -67,7 +67,7 @@ class UserController extends BaseController
     public function delete(Request $request, ManagerRegistry $doctrine): ApiResponse
     {
         $entityManager = $doctrine->getManager();
-        $entity = $entityManager->getRepository(User::class)->findOneBy(['uuid' => $request->get('uuid')]);
+        $entity = $entityManager->getRepository(KeyValue::class)->findOneBy(['uuid' => $request->get('uuid')]);
         if (!$entity) {
             return new ApiResponse(ApiResponseCode::NOT_FOUND);
         }
