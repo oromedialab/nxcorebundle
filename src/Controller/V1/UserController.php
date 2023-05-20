@@ -3,6 +3,7 @@
 namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,12 +13,20 @@ use OroMediaLab\NxCoreBundle\Entity\User;
 
 class UserController extends BaseController
 {
-    public function save(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passwordHasher): ApiResponse
-    {
+    public function save(
+        Request $request,
+        ManagerRegistry $doctrine,
+        UserPasswordHasherInterface $passwordHasher,
+        EventDispatcherInterface $dispatcher
+    ): ApiResponse {
         $entityManager = $doctrine->getManager();
         $postData = $request->request->all();
         $uuid = !empty($postData['uuid']) ? $postData['uuid'] : null;
         $isEdit = 'nxcore.routes.api_v1_user_update' === $request->get('_route');
+        $events = array(
+            'OnCreated' => false === $isEdit,
+            'OnUpdated' => true === $isEdit
+        );
         $user = $request->get('user');
         if (!empty($uuid) && true === $isEdit) {
             $user = $doctrine->getRepository(User::class)->findOneBy(['uuid' => $uuid]);
@@ -39,6 +48,12 @@ class UserController extends BaseController
         $user->setEnabled($postData['enabled']);
         $entityManager->persist($user);
         $entityManager->flush();
+        foreach ($events as $eventName => $eventValue) {
+            if (true === $eventValue) {
+                $eventFCQN = '\OroMediaLab\NxCoreBundle\Event\Entity\User\\'.$eventName;
+                $dispatcher->dispatch(new $eventFCQN($user), $eventFCQN::NAME);
+            }
+        }
         return new ApiResponse(true === $isEdit ? ApiResponseCode::RESOURCE_UPDATED : ApiResponseCode::RESOURCE_CREATED);
     }
 

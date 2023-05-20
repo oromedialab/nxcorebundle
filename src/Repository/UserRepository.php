@@ -6,6 +6,7 @@ use OroMediaLab\NxCoreBundle\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use OroMediaLab\NxCoreBundle\Entity\KeyValue;
 
 class UserRepository extends ServiceEntityRepository
 {
@@ -21,6 +22,7 @@ class UserRepository extends ServiceEntityRepository
         $limit = !empty($params['filter']['limit']) ? $params['filter']['limit'] : 30;
         $role = !empty($params['filter']['role']) ? explode(',', $params['filter']['role']): null;
         $uuid = !empty($params['filter']['uuid']) ? $params['filter']['uuid'] : null;
+        $keyValueNames = !empty($params['filter']['key_value']) ? explode(',', str_replace(' ', '', $params['filter']['key_value'])) : array();
         $firstResult = ($page - 1) * $limit;
         $maxResults = $limit;
         $dql = '
@@ -67,7 +69,9 @@ class UserRepository extends ServiceEntityRepository
         $totalItems = count($paginator);
         $totalPages = ceil($totalItems / $maxResults);
         $items = [];
+        $userUuids = array();
         foreach ($paginator as $row) {
+            $userUuids[] = (string)$row->getUuid();
             $item = [];
             $item['id'] = $row->getId();
             $item['uuid'] = (string)$row->getUuid();
@@ -78,6 +82,30 @@ class UserRepository extends ServiceEntityRepository
             $item['role'] = $row->getRoles()[0];
             $item['created'] = $row->getCreatedAt()->format(\DateTime::RFC3339);
             $items[] = $item;
+        }
+        if (!empty($keyValueNames)) {
+            $keyValuesFilter = array();
+            $keyValuesFilter['user_uuid'] = $userUuids;
+            if (in_array('all', $keyValueNames)) {
+                $keyValuesFilter['key'] = 'all';
+            } else {
+                $keyValuesFilter['keys'] = implode(',', $keyValueNames);
+            }
+            $keyValues = $this->getEntityManager()->getRepository(KeyValue::class)->fetchAll([
+                'filter' => $keyValuesFilter
+            ]);
+            $items = array_map(function($value) use ($keyValues, $keyValueNames) {
+                foreach ($keyValues as $keyValue) {
+                    if (!empty($keyValue['user']['uuid']) && $keyValue['user']['uuid'] === $value['uuid']) {
+                        if (in_array('all', $keyValueNames)) {
+                            $value[$keyValue['key']] = $keyValue['value'];
+                        } else if (in_array($keyValue['key'], $keyValueNames)) {
+                            $value[$keyValue['key']] = $keyValue['value'];
+                        }
+                    }
+                }
+                return $value;
+            }, $items);
         }
         if (null !== $uuid) {
             return !empty($items[0]) ? $items[0] : null;
