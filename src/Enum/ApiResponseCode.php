@@ -18,6 +18,8 @@ enum ApiResponseCode: string
     case FILE_NOT_UPLOADED = 'file_not_uploaded';
     case FILE_UPLOADED = 'file_uploaded';
     case EMAIL_SENT = 'email_sent';
+    case REQUEST_SUCCESSFUL = 'request_successful';
+    case REQUEST_FAILURE = 'request_failure';
 
     public function httpStatusCode(): int
     {
@@ -34,7 +36,9 @@ enum ApiResponseCode: string
             self::DUPLICATE_RESOURCE => JsonResponse::HTTP_CONFLICT,
             self::FILE_NOT_UPLOADED => JsonResponse::HTTP_BAD_REQUEST,
             self::FILE_UPLOADED => JsonResponse::HTTP_OK,
-            self::EMAIL_SENT => JsonResponse::HTTP_OK
+            self::EMAIL_SENT => JsonResponse::HTTP_OK,
+            self::REQUEST_SUCCESSFUL => JsonResponse::HTTP_OK,
+            self::REQUEST_FAILURE => JsonResponse::HTTP_BAD_REQUEST
         };
     }
 }
