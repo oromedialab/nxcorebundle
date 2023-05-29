@@ -43,6 +43,10 @@ services:
         class: OroMediaLab\NxCoreBundle\Command\UserCreateCommand
         tags:
             - { name: 'console.command', command: 'app:user:create' }
+    nxcore.command.user_reset_password:
+        class: OroMediaLab\NxCoreBundle\Command\UserResetPasswordCommand
+        tags:
+            - { name: 'console.command', command: 'app:user:reset-password' }
     nxcore.eventlistener.cors:
         class: OroMediaLab\NxCoreBundle\EventListener\CorsListener
         tags:
