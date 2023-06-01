@@ -77,7 +77,12 @@ class KeyValueRepository extends ServiceEntityRepository
 
     public function deleteAllForUser(User $user)
     {
-        $query = $this->getEntityManager()->createQuery('DELETE FROM KeyValue kv WHERE kv.user = :user');
+        $query = $this->getEntityManager()->createQuery('
+            DELETE FROM
+                OroMediaLab\NxCoreBundle\Entity\KeyValue kv
+            WHERE
+                kv.user = :user'
+        );
         $query->setParameter('user', $user);
         $query->execute();
     }
