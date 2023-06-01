@@ -2,9 +2,10 @@
 
 namespace OroMediaLab\NxCoreBundle\Repository;
 
-use OroMediaLab\NxCoreBundle\Entity\KeyValue;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use OroMediaLab\NxCoreBundle\Entity\KeyValue;
+use OroMediaLab\NxCoreBundle\Entity\User;
 
 class KeyValueRepository extends ServiceEntityRepository
 {
@@ -72,5 +73,12 @@ class KeyValueRepository extends ServiceEntityRepository
             return [];
         }
         return true === $isSingleRecord && !empty($items[0]) ? $items[0] : $items;
+    }
+
+    public function deleteAllForUser(User $user)
+    {
+        $query = $this->getEntityManager()->createQuery('DELETE FROM KeyValue kv WHERE kv.user = :user');
+        $query->setParameter('user', $user);
+        $query->execute();
     }
 }

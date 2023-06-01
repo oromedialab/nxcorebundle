@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use OroMediaLab\NxCoreBundle\Utils\ApiResponse;
 use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
 use OroMediaLab\NxCoreBundle\Entity\User;
+use OroMediaLab\NxCoreBundle\Entity\KeyValue;
 
 class UserController extends BaseController
 {
@@ -86,6 +87,9 @@ class UserController extends BaseController
         if (!$entity) {
             return new ApiResponse(ApiResponseCode::NOT_FOUND);
         }
+        // Delete all associated KeyValue
+        $entityManager->getRepository(KeyValue::class)->deleteAllForUser($entity);
+        // Delete User Entity
         $entityManager->remove($entity);
         $entityManager->flush();
         return new ApiResponse(ApiResponseCode::RESOURCE_DELETED);
