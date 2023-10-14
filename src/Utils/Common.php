@@ -101,4 +101,33 @@ class Common
         }
         return $text;
     }
+
+    public static function calculateDateTimeDifference(\DateTimeInterface $start, \DateTimeInterface $end)
+    {
+        $interval = $start->diff($end);
+        $days = $interval->d;
+        $hours = $interval->h;
+        $minutes = $interval->i;
+        $result = '';
+        if ($days > 2) {
+            $result .= $days . ' days';
+        } elseif ($days > 0) {
+            $result .= $days . ' day';
+        }
+        if ($days < 2) {
+            if ($hours > 0) {
+                if ($result !== '') {
+                    $result .= ', ';
+                }
+                $result .= $hours . ' hour' . ($hours > 1 ? 's' : '');
+            }
+            if ($minutes > 0) {
+                if ($result !== '') {
+                    $result .= ' ';
+                }
+                $result .= $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+            }
+        }
+        return $result;
+    }
 }
