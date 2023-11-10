@@ -22,6 +22,7 @@ class UserRepository extends ServiceEntityRepository
         $limit = !empty($params['filter']['limit']) ? $params['filter']['limit'] : 30;
         $role = !empty($params['filter']['role']) ? explode(',', $params['filter']['role']): null;
         $uuid = !empty($params['filter']['uuid']) ? $params['filter']['uuid'] : null;
+        $enabled = (!empty($params['filter']['enabled']) && 'null' !== $params['filter']['enabled']) ? filter_var($params['filter']['enabled'], FILTER_VALIDATE_BOOLEAN) : null;
         $keyValueNames = !empty($params['filter']['key_value']) ? explode(',', str_replace(' ', '', $params['filter']['key_value'])) : array();
         $firstResult = ($page - 1) * $limit;
         $maxResults = $limit;
@@ -33,6 +34,9 @@ class UserRepository extends ServiceEntityRepository
             WHERE
                 1 = 1
         ';
+        if (null !== $enabled) {
+            $dql .= ' AND user.enabled = :enabled';
+        }
         $searchForId = strpos($q, '#') === 0;
         if (!empty($q)) {
             if ($searchForId) {
@@ -56,6 +60,9 @@ class UserRepository extends ServiceEntityRepository
             } else {
                 $query->setParameter(':keyword', '%'.$q.'%');
             }
+        }
+        if (null !== $enabled) {
+            $query->setParameter(':enabled', $enabled);
         }
         if (!empty($role)) {
             $query->setParameter(':role', $role);
