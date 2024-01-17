@@ -40,7 +40,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     private string $name;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private string $emailAddress;
+    private ?string $emailAddress = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private string $contactNumber;
