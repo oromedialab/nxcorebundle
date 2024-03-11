@@ -29,7 +29,7 @@
     },
     "repositories": [
         {
-          "type": "git",
+          "type": "vcs",
           "url": "git@github.com:oromedialab/DoctrineBehaviors.git"
         }
     ],
