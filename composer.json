@@ -29,16 +29,8 @@
     },
     "repositories": [
         {
-            "type": "package",
-            "package": {
-                "name": "oromedialab/DoctrineBehaviors",
-                "version": "2.6.3",
-                "source": {
-                    "url": "https://github.com/oromedialab/DoctrineBehaviors.git",
-                    "type": "git",
-                    "reference": "master"
-                }
-            }
+            "url": "https://github.com/oromedialab/DoctrineBehaviors.git",
+            "type": "git"
         }
     ],
     "require": {
@@ -46,7 +38,7 @@
         "symfony/framework-bundle": "^7.0.4",
         "symfony/orm-pack": "^2.4.1",
         "symfony/security-bundle": "^7.0.5",
-        "oromedialab/DoctrineBehaviors": "^2.6.3",
+        "knplabs/doctrine-behaviors": "2.6.3",
         "symfony/yaml": "^7.0.3",
         "symfony/dotenv": "^7.0.4",
         "lexik/jwt-authentication-bundle": "^2.20.3",
