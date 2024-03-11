@@ -39,7 +39,7 @@
                     "reference": "master"
                 }
             }
-        },
+        }
     ],
     "require": {
         "php": ">=8.1",
