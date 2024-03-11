@@ -29,8 +29,8 @@
     },
     "repositories": [
         {
-          "type": "git",
-          "url": "https://github.com/oromedialab/DoctrineBehaviors"
+            "url": "https://github.com/oromedialab/DoctrineBehaviors.git",
+            "type": "git"
         }
     ],
     "require": {
