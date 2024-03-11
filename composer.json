@@ -32,7 +32,7 @@
             "type": "package",
             "package": {
                 "name": "oromedialab/DoctrineBehaviors",
-                "version": "master",
+                "version": "2.6.3",
                 "source": {
                     "url": "https://github.com/oromedialab/DoctrineBehaviors.git",
                     "type": "git",
