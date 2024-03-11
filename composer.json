@@ -32,11 +32,11 @@
             "type": "package",
             "package": {
                 "name": "oromedialab/DoctrineBehaviors",
-                "version": "dev-master",
+                "version": "master",
                 "source": {
                     "url": "https://github.com/oromedialab/DoctrineBehaviors.git",
                     "type": "git",
-                    "reference": "2.6.2"
+                    "reference": "master"
                 }
             }
         }
@@ -46,7 +46,7 @@
         "symfony/framework-bundle": "^7.0.4",
         "symfony/orm-pack": "^2.4.1",
         "symfony/security-bundle": "^7.0.5",
-        "oromedialab/DoctrineBehaviors": "2.6.3",
+        "oromedialab/DoctrineBehaviors": "master",
         "symfony/yaml": "^7.0.3",
         "symfony/dotenv": "^7.0.4",
         "lexik/jwt-authentication-bundle": "^2.20.3",
