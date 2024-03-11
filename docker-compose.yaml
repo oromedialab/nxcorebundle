@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  php83-service:
+    container_name: nxcorebundle-php83-container
+    build:
+        context: .
+        dockerfile: ./Dockerfile
+    ports:
+        - "9001:9001"
+    volumes:
+        - ./:/var/www
+    networks:
+        - common
+  mysql8-service:
+    container_name: nxcorebundle-mysql8-container
+    image: mysql:latest
+    volumes: 
+      - ./docker-init:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_DATABASE: ihc
+      MYSQL_USER: oroml
+      MYSQL_PASSWORD: oroml
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    ports:
+        - "4307:3306"
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql_mode=""
+    restart: always
+    networks:
+        - common
+  phpmyadmin-service:
+    container_name: nxcorebundle-phpmyadmin-container
+    depends_on:
+      - mysql8-service
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8002:80
+    environment:
+      - PMA_HOST=nxcorebundle-mysql8-container
+      - PMA_PORT=3306
+    networks:
+      - common
+networks:
+  common:
+    driver: bridge
