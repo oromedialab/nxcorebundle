@@ -135,7 +135,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->enabled;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
 
     }
