@@ -33,9 +33,6 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     #[ORM\Column(length: 100, nullable: true)]
     private string $password;
 
-    #[ORM\Column(type: 'string')]
-    protected $role;
-
     #[ORM\Column(length: 50, nullable: false)]
     private string $name;
 
