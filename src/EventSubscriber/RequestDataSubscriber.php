@@ -17,7 +17,7 @@ class RequestDataSubscriber implements EventSubscriberInterface
     public function convertJsonStringToArray(ControllerEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->getContentType() !== 'json' || empty($request->getContent())) {
+        if ($request->getContentTypeFormat() !== 'json' || empty($request->getContent())) {
             return;
         }
         $data = $this->initData($request);
