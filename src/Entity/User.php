@@ -17,6 +17,7 @@ use OroMediaLab\NxCoreBundle\Repository\UserRepository;
 #[ORM\Table(name: "user")]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
+#[ORM\DiscriminatorMap(['user' => 'User'])]
 class User implements UuidableInterface, TimestampableInterface, PasswordAuthenticatedUserInterface, UserInterface
 {
     use UuidableTrait;
@@ -29,6 +30,9 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
 
     #[ORM\Column(type: 'string', length: 50, unique: true, nullable: false)]
     private string $username;
+
+    #[ORM\Column(type: 'string')]
+    protected $role = 'ROLE_USER';
 
     #[ORM\Column(length: 100, nullable: true)]
     private string $password;
