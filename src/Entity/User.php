@@ -16,8 +16,6 @@ use OroMediaLab\NxCoreBundle\Repository\UserRepository;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "user")]
 #[ORM\InheritanceType('SINGLE_TABLE')]
-#[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
-#[ORM\DiscriminatorMap(['user' => 'User'])]
 class User implements UuidableInterface, TimestampableInterface, PasswordAuthenticatedUserInterface, UserInterface
 {
     use UuidableTrait;

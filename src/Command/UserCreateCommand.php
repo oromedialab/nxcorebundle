@@ -40,11 +40,11 @@ class UserCreateCommand extends Command
         // Username
         $question = new Question('Username: ');
         $question->setValidator(function ($answer) {
-            if (!preg_match('/^[a-zA-Z0-9.@][a-zA-Z0-9.@]{3,19}$/', $answer)) {
-                throw new \RuntimeException(
-                    'Username must be all lowercase, start with a letter, must contain letter and numbers only, must be between 4-20 characters'
-                );
-            }
+            // if (!preg_match('/^[a-zA-Z0-9.@][a-zA-Z0-9.@]{3,19}$/', $answer)) {
+            //     throw new \RuntimeException(
+            //         'Username must be all lowercase, start with a letter, must contain letter and numbers only, must be between 4-20 characters'
+            //     );
+            // }
             $user = $this->em->getRepository(User::class)->findOneByUsername($answer);
             if ($user) {
                 throw new \RuntimeException(
