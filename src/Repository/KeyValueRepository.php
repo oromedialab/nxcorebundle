@@ -16,38 +16,42 @@ class KeyValueRepository extends ServiceEntityRepository
 
     public function fetchAll(array $params = array()): ?array
     {
-        $keys = !empty($params['filter']['keys']) ? explode(',', str_replace(' ', '', $params['filter']['keys'])) : array();
+        // $params['filter'] is to get directly from url query param
+        // $params['params'] is to fetch data internally
         $key = !empty($params['filter']['key']) ? $params['filter']['key'] : null;
+        $keys = !empty($params['params']['keys']) ? explode(',', str_replace(' ', '', $params['params']['keys'])) : array();
         $userUuid = [];
-        if (!empty($params['filter']['user_uuid']) && is_string($params['filter']['user_uuid'])) {
-            $userUuid = [$params['filter']['user_uuid']];
+        $skipUserRecord = isset($params['params']['skip_user_records']) ? (bool)$params['params']['skip_user_records'] : false;
+        if (!empty($params['params']['user_uuid']) && is_string($params['params']['user_uuid'])) {
+            $userUuid = [$params['params']['user_uuid']];
         }
-        if (!empty($params['filter']['user_uuid']) && is_array($params['filter']['user_uuid'])) {
-            $userUuid = $params['filter']['user_uuid'];
+        if (!empty($params['params']['user_uuid']) && is_array($params['params']['user_uuid'])) {
+            $userUuid = $params['params']['user_uuid'];
         }
-        $isSingleRecord = !empty($key) && 'all' !== $key;
-        $dql = '
-            SELECT
-                key_value,
-                user
-            FROM
-                OroMediaLab\NxCoreBundle\Entity\KeyValue key_value
-            LEFT JOIN
-                key_value.user user
-            WHERE
-                1 = 1
-        ';
-        if ('all' !== $key) {
+        $fetchAll = in_array('all', $keys);
+        $dql = 'SELECT key_value';
+        if (!empty($userUuid) && false === $skipUserRecord) {
+            $dql .= ', user';
+        }
+        $dql .= ' FROM OroMediaLab\NxCoreBundle\Entity\KeyValue key_value';
+        if (!empty($userUuid) && false === $skipUserRecord) {
+            $dql .= ' LEFT JOIN key_value.user user';
+        }
+        $dql .= ' WHERE 1 = 1';
+        if (!$fetchAll) {
             $dql .= ' AND key_value.keyName IN (:keys)';
         }
-        if (!empty($userUuid)) {
+        if (!empty($userUuid) && false === $skipUserRecord) {
             $dql .= ' AND user.uuid IN (:user_uuid)';
         }
-        $query = $this->getEntityManager()->createQuery($dql);
-        if ('all' !== $key) {
-            $query->setParameter(':keys', true === $isSingleRecord ? [$key] : $keys);
+        if (true === $skipUserRecord) {
+            $dql .= ' AND key_value.user IS NULL';
         }
-        if (!empty($userUuid)) {
+        $query = $this->getEntityManager()->createQuery($dql);
+        if (!$fetchAll) {
+            $query->setParameter(':keys', !empty($key) ? [$key] : $keys);
+        }
+        if (!empty($userUuid) && false === $skipUserRecord) {
             $query->setParameter(':user_uuid', $userUuid);
         }
         $arrayResult = $query->getResult();
@@ -72,7 +76,7 @@ class KeyValueRepository extends ServiceEntityRepository
         if (empty($items)) {
             return [];
         }
-        return true === $isSingleRecord && !empty($items[0]) ? $items[0] : $items;
+        return !empty($key) ? $items[0] : $items;
     }
 
     public function deleteAllForUser(User $user)

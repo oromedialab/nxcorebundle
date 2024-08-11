@@ -3,7 +3,6 @@
 namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -13,6 +12,8 @@ use OroMediaLab\NxCoreBundle\Utils\ApiResponse;
 use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
 use OroMediaLab\NxCoreBundle\Entity\ContactMessage;
 use OroMediaLab\NxCoreBundle\Entity\User;
+use OroMediaLab\NxCoreBundle\Attribute\ValidateRequest;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ContactMessageController extends BaseController
 {
@@ -23,6 +24,12 @@ class ContactMessageController extends BaseController
         $this->config = $config;
     }
 
+    #[ValidateRequest(rules: [
+        'name' => [new Assert\NotBlank(), new Assert\Length(['min' => 3])],
+        'email_address' => [new Assert\NotBlank(), new Assert\Email()],
+        'contact_number' => [new Assert\Type('integer'), new Assert\Length(['min' => 10, 'max' => 10])],
+        'message' => [new Assert\NotBlank(), new Assert\Length(['min' => 10, 'max' => 5000])]
+    ])]
     public function send(
         Request $request,
         ManagerRegistry $doctrine,
