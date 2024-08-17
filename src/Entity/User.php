@@ -84,7 +84,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return [$this->role];
     }
 
-    public function getRole(): strig
+    public function getRole(): string
     {
         return $this->role;
     }
