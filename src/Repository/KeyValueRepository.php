@@ -44,9 +44,9 @@ class KeyValueRepository extends ServiceEntityRepository
         if (!empty($userUuid) && false === $skipUserRecord) {
             $dql .= ' AND user.uuid IN (:user_uuid)';
         }
-        if (true === $skipUserRecord) {
-            $dql .= ' AND key_value.user IS NULL';
-        }
+        // if (true === $skipUserRecord) {
+        //     $dql .= ' AND key_value.user IS NULL';
+        // }
         $query = $this->getEntityManager()->createQuery($dql);
         if (!$fetchAll) {
             $query->setParameter(':keys', !empty($key) ? [$key] : $keys);
