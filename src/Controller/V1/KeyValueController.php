@@ -24,7 +24,7 @@ class KeyValueController extends BaseController
         $entityManager = $doctrine->getManager();
         $postData = $request->request->all();
         $uuid = !empty($postData['uuid']) ? $postData['uuid'] : null;
-        $isEdit = 'api_v1_key_value_update' === $request->get('_route');
+        $isEdit = 'nxcore.routes.api_v1_key_value_update' === $request->get('_route');
         $keyValueEntity = null;
         if (true === $isEdit) {
             $keyValueEntity = $doctrine->getRepository(KeyValue::class)->findOneBy(['uuid' => $uuid]);
