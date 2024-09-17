@@ -11,9 +11,4 @@ use Doctrine\ORM\Mapping as ORM;
 class UserAdmin extends User
 {
     protected $role = 'ROLE_ADMIN';
-
-    public function getRole()
-    {
-        return $this->role;
-    }
 }

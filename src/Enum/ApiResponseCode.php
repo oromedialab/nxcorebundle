@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 enum ApiResponseCode: string
 {
+    case UNAUTHORIZED_ACCESS = 'unauthorized_access';
     case AUTH_INVALID_CREDENTIALS = 'auth_invalid_credentials';
     case AUTH_SUCCESSFUL = 'auth_successful';
     case AUTH_MISSING_TOKEN = 'auth_missing_token';
@@ -28,6 +29,7 @@ enum ApiResponseCode: string
     {
         return match($this)
         {
+            self::UNAUTHORIZED_ACCESS => JsonResponse::HTTP_UNAUTHORIZED,
             self::AUTH_INVALID_CREDENTIALS => JsonResponse::HTTP_UNAUTHORIZED,
             self::AUTH_SUCCESSFUL => JsonResponse::HTTP_OK,
             self::AUTH_MISSING_TOKEN => JsonResponse::HTTP_UNAUTHORIZED,
