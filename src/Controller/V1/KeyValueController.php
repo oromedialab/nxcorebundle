@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 class KeyValueController extends BaseController
 {
     #[ValidateRequest(rules: [
-        'key' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 40])],
-        'value' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 50000])]
+        'key' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 50])],
+        'value' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 100000])]
     ])]
     public function save(Request $request, ManagerRegistry $doctrine, #[CurrentUser] ?User $user): ApiResponse
     {
