@@ -15,15 +15,16 @@ class ApiResponse extends JsonResponse
     public static function body(ApiResponseCode $apiResponseCode, array $payload = array(), array $options = [])
     {
         $now = new \DateTime();
-        $response = [
-            'response_code' => $apiResponseCode->value,
-            'http_status_code' => $apiResponseCode->httpStatusCode(),
-            'timestamp' => $now->format(\DateTime::RFC3339),
-            'payload' => $payload
-        ];
+        $result = [];
+        $result['response_code'] = $apiResponseCode->value;
+        $result['http_status_code'] = $apiResponseCode->httpStatusCode();
         if (!empty($options['message'])) {
-            $response['message'] = $options['message'];
+            $result['message'] = $options['message'];
         }
-        return $response;
+        $result['timestamp'] = $now->format(\DateTime::RFC3339);
+        if (!empty($payload)) {
+            $result['payload'] = $payload;
+        }
+        return $result;
     }
 }

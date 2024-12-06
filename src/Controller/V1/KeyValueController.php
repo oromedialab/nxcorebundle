@@ -3,21 +3,28 @@
 namespace OroMediaLab\NxCoreBundle\Controller\V1;
 
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use OroMediaLab\NxCoreBundle\Attribute\ValidateRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
 use OroMediaLab\NxCoreBundle\Utils\ApiResponse;
 use OroMediaLab\NxCoreBundle\Enum\ApiResponseCode;
 use OroMediaLab\NxCoreBundle\Entity\KeyValue;
 use OroMediaLab\NxCoreBundle\Entity\User;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\Response;
 
 class KeyValueController extends BaseController
 {
+    #[ValidateRequest(rules: [
+        'key' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 50])],
+        'value' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 100000])]
+    ])]
     public function save(Request $request, ManagerRegistry $doctrine, #[CurrentUser] ?User $user): ApiResponse
     {
         $entityManager = $doctrine->getManager();
         $postData = $request->request->all();
         $uuid = !empty($postData['uuid']) ? $postData['uuid'] : null;
-        $isEdit = 'api_v1_key_value_update' === $request->get('_route');
+        $isEdit = 'nxcore.routes.api_v1_key_value_update' === $request->get('_route');
         $keyValueEntity = null;
         if (true === $isEdit) {
             $keyValueEntity = $doctrine->getRepository(KeyValue::class)->findOneBy(['uuid' => $uuid]);
@@ -42,28 +49,33 @@ class KeyValueController extends BaseController
         return new ApiResponse($isEdit ? ApiResponseCode::RESOURCE_UPDATED : ApiResponseCode::RESOURCE_CREATED);
     }
 
-    public function update(Request $request, ManagerRegistry $doctrine): ApiResponse
+    #[ValidateRequest(rules: [
+        'uuid' => [new Assert\Uuid()],
+        'key' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 50])],
+        'value' => [new Assert\NotBlank(), new Assert\Length(['min' => 1, 'max' => 100000])]
+    ])]
+    public function update(Request $request, ManagerRegistry $doctrine,  #[CurrentUser] ?User $user): ApiResponse
     {
-        return $this->forward('App\Controller\Api\V1\KeyValueController::save', [
-            'uuid' => $request->get('uuid'),
-            '_route' => $request->attributes->get('_route'),
-            '_route_params' => $request->attributes->get('_route_params')
-        ]);
+        return $this->save($request, $doctrine, $user);
     }
 
+    #[ValidateRequest(rules: ['key' => [new Assert\Type('string'), new Assert\NotBlank()]])]
     public function index(Request $request, ManagerRegistry $doctrine): ApiResponse
     {
-        $entityManager = $doctrine->getManager();
         $params = $request->query->all();
         $items = $doctrine->getRepository(KeyValue::class)->fetchAll([
-            'filter' => $params
+            'filter' => $params,
+            'params' => [
+                'skip_user_records' => true
+            ]
         ]);
-        if (!empty($params['uuid']) && empty($items)) {
+        if (empty($items)) {
             return new ApiResponse(ApiResponseCode::NOT_FOUND);
         }
         return new ApiResponse(ApiResponseCode::FETCH_SUCCESS, $items);
     }
 
+    #[ValidateRequest(rules: ['uuid' => [new Assert\Uuid()]])]
     public function delete(Request $request, ManagerRegistry $doctrine): ApiResponse
     {
         $entityManager = $doctrine->getManager();

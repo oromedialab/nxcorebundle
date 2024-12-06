@@ -8,6 +8,7 @@ services:
     nxcore.eventsubscriber.request_validation:
         class: OroMediaLab\NxCoreBundle\EventSubscriber\RequestValidationSubscriber
         tags: [kernel.event_subscriber]
+        arguments: ['@validator']
     nxcore.controller.v1.account_controller:
         class: OroMediaLab\NxCoreBundle\Controller\V1\AccountController
         tags: ['controller.service_arguments']

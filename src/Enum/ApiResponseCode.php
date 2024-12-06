@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 enum ApiResponseCode: string
 {
+    case UNAUTHORIZED_ACCESS = 'unauthorized_access';
     case AUTH_INVALID_CREDENTIALS = 'auth_invalid_credentials';
     case AUTH_SUCCESSFUL = 'auth_successful';
     case AUTH_MISSING_TOKEN = 'auth_missing_token';
@@ -22,11 +23,14 @@ enum ApiResponseCode: string
     case EMAIL_SENT = 'email_sent';
     case REQUEST_SUCCESSFUL = 'request_successful';
     case REQUEST_FAILURE = 'request_failure';
+    case VALIDATION_FAILED = 'validation_failed';
+    case INSUFFICIENT_FUNDS = 'insufficient_funds';
 
     public function httpStatusCode(): int
     {
         return match($this)
         {
+            self::UNAUTHORIZED_ACCESS => JsonResponse::HTTP_UNAUTHORIZED,
             self::AUTH_INVALID_CREDENTIALS => JsonResponse::HTTP_UNAUTHORIZED,
             self::AUTH_SUCCESSFUL => JsonResponse::HTTP_OK,
             self::AUTH_MISSING_TOKEN => JsonResponse::HTTP_UNAUTHORIZED,
@@ -42,7 +46,9 @@ enum ApiResponseCode: string
             self::FILE_UPLOADED => JsonResponse::HTTP_OK,
             self::EMAIL_SENT => JsonResponse::HTTP_OK,
             self::REQUEST_SUCCESSFUL => JsonResponse::HTTP_OK,
-            self::REQUEST_FAILURE => JsonResponse::HTTP_BAD_REQUEST
+            self::REQUEST_FAILURE => JsonResponse::HTTP_BAD_REQUEST,
+            self::VALIDATION_FAILED => JsonResponse::HTTP_BAD_REQUEST,
+            self::INSUFFICIENT_FUNDS => JsonResponse::HTTP_PAYMENT_REQUIRED
         };
     }
 }

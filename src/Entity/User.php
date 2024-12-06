@@ -16,7 +16,6 @@ use OroMediaLab\NxCoreBundle\Repository\UserRepository;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "user")]
 #[ORM\InheritanceType('SINGLE_TABLE')]
-#[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
 class User implements UuidableInterface, TimestampableInterface, PasswordAuthenticatedUserInterface, UserInterface
 {
     use UuidableTrait;
@@ -29,6 +28,9 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
 
     #[ORM\Column(type: 'string', length: 50, unique: true, nullable: false)]
     private string $username;
+
+    #[ORM\Column(type: 'string')]
+    protected $role = 'ROLE_USER';
 
     #[ORM\Column(length: 100, nullable: true)]
     private string $password;
@@ -80,6 +82,11 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     public function getRoles(): array
     {
         return [$this->role];
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
     }
 
     public function setRole(string $role): self
