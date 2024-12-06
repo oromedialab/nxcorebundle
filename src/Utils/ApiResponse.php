@@ -18,10 +18,10 @@ class ApiResponse extends JsonResponse
         $result = [];
         $result['response_code'] = $apiResponseCode->value;
         $result['http_status_code'] = $apiResponseCode->httpStatusCode();
+        $result['timestamp'] = $now->format(\DateTime::RFC3339);
         if (!empty($options['message'])) {
             $result['message'] = $options['message'];
         }
-        $result['timestamp'] = $now->format(\DateTime::RFC3339);
         if (!empty($payload)) {
             $result['payload'] = $payload;
         }
