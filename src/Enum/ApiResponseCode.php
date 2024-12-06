@@ -25,6 +25,7 @@ enum ApiResponseCode: string
     case REQUEST_FAILURE = 'request_failure';
     case VALIDATION_FAILED = 'validation_failed';
     case INSUFFICIENT_FUNDS = 'insufficient_funds';
+    case ACCOUNT_DISABLED = 'account_disabled';
 
     public function httpStatusCode(): int
     {
@@ -48,7 +49,8 @@ enum ApiResponseCode: string
             self::REQUEST_SUCCESSFUL => JsonResponse::HTTP_OK,
             self::REQUEST_FAILURE => JsonResponse::HTTP_BAD_REQUEST,
             self::VALIDATION_FAILED => JsonResponse::HTTP_BAD_REQUEST,
-            self::INSUFFICIENT_FUNDS => JsonResponse::HTTP_PAYMENT_REQUIRED
+            self::INSUFFICIENT_FUNDS => JsonResponse::HTTP_PAYMENT_REQUIRED,
+            self::ACCOUNT_DISABLED => JsonResponse::HTTP_FORBIDDEN
         };
     }
 }
