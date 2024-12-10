@@ -2,6 +2,12 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+    nxcore.validator.unique_entity:
+        class: OroMediaLab\NxCoreBundle\Validator\UniqueEntityValidator
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags:
+            - { name: validator.constraint_validator }
     nxcore.eventsubscriber.request_data:
         class: OroMediaLab\NxCoreBundle\EventSubscriber\RequestDataSubscriber
         tags: [kernel.event_subscriber]

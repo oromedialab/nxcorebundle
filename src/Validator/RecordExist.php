@@ -6,13 +6,13 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 #[\Attribute]
-class UniqueEntity extends Constraint
+class RecordExist extends Constraint
 {
     protected string $property;
     
     protected string $entityFqcn;
 
-    protected string $message = 'A record matching the criteria already exists.';
+    protected string $message = 'Record does not exist';
 
     #[HasNamedArguments]
     public function __construct(
@@ -55,10 +55,5 @@ class UniqueEntity extends Constraint
     public function getRequiredOptions(): array
     {
         return ['property', 'entityFqcn'];
-    }
-
-    public function validatedBy(): string
-    {
-        return static::class.'Validator';
     }
 }

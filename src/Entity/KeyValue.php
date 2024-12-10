@@ -23,7 +23,7 @@ class KeyValue implements UuidableInterface, TimestampableInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 100)]
     private ?string $keyName = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
