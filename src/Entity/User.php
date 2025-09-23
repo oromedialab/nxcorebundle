@@ -29,9 +29,6 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     #[ORM\Column(type: 'string', length: 50, unique: true, nullable: false)]
     private string $username;
 
-    #[ORM\Column(type: 'string')]
-    protected $role = 'ROLE_USER';
-
     #[ORM\Column(length: 100, nullable: true)]
     private string $password;
 
@@ -46,6 +43,9 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
 
     #[ORM\Column(type: 'boolean')]
     private bool $enabled = true;
+
+    #[ORM\ManyToOne(targetEntity: Role::class)]
+    private Role $role;
 
     public function getId(): ?int
     {
@@ -77,22 +77,6 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     public function getPassword(): string
     {
         return $this->password;
-    }
-
-    public function getRoles(): array
-    {
-        return [$this->role];
-    }
-
-    public function getRole(): string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): self
-    {
-        $this->role = $role;
-        return $this;
     }
 
     public function setName(string $name): self
@@ -142,5 +126,40 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     public function eraseCredentials(): void
     {
 
+    }
+
+    public function getRoles(): array
+    {
+        $roles = [];
+        if ($this->role && $this->role->isEnabled()) {
+            $roles[] = 'ROLE_'.$this->role->getUuid();
+        }
+        if (empty($roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+        return $roles;
+    }
+
+    public function getRole(bool $toString = true): Role|string
+    {
+        if (true === $toString) {
+            return $this->role->getName();
+        }
+        return $this->role;
+    }
+
+    public function setRole(?Role $role): self
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    public function hasRole(string $roleName): bool
+    {
+        if (!$this->role || !$this->role->isEnabled()) {
+            return false;
+        }
+        
+        return strtolower($this->role->getName()) === strtolower($roleName);
     }
 }
