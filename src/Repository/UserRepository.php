@@ -86,7 +86,22 @@ class UserRepository extends ServiceEntityRepository
             $item['email_address'] = $row->getEmailAddress();
             $item['contact_number'] = $row->getContactNumber();
             $item['enabled'] = $row->isEnabled();
-            $item['role'] = $row->getRoles()[0];
+            // Include role information
+            $userRole = $row->getRole(false); // Get Role object
+            if ($userRole) {
+                $item['role'] = [
+                    'id' => $userRole->getId(),
+                    'uuid' => (string)$userRole->getUuid(),
+                    'name' => $userRole->getName(),
+                    'description' => $userRole->getDescription(),
+                    'enabled' => $userRole->isEnabled(),
+                    'permissions' => $userRole->getPermissions(),
+                    'created' => $userRole->getCreatedAt()->format(\DateTime::RFC3339),
+                    'updated' => $userRole->getUpdatedAt()->format(\DateTime::RFC3339)
+                ];
+            } else {
+                $item['role'] = null;
+            }
             $item['created'] = $row->getCreatedAt()->format(\DateTime::RFC3339);
             $items[] = $item;
         }
@@ -130,91 +145,4 @@ class UserRepository extends ServiceEntityRepository
         ];
     }
 
-    /**
-     * Find users by role name
-     */
-    public function findByRole(string $roleName): array
-    {
-        return $this->createQueryBuilder('u')
-            ->innerJoin('u.role', 'r')
-            ->where('r.name = :roleName')
-            ->andWhere('r.enabled = :enabled')
-            ->andWhere('u.enabled = :enabled')
-            ->setParameter('roleName', $roleName)
-            ->setParameter('enabled', true)
-            ->orderBy('u.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Find users having any of the specified role names
-     */
-    public function findByAnyRole(array $roleNames): array
-    {
-        if (empty($roleNames)) {
-            return [];
-        }
-
-        return $this->createQueryBuilder('u')
-            ->innerJoin('u.role', 'r')
-            ->where('r.name IN (:roleNames)')
-            ->andWhere('r.enabled = :enabled')
-            ->andWhere('u.enabled = :enabled')
-            ->setParameter('roleNames', $roleNames)
-            ->setParameter('enabled', true)
-            ->orderBy('u.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Get users with their role (includes role data)
-     */
-    public function findUsersWithRole(): array
-    {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.role', 'r')
-            ->addSelect('r')
-            ->where('u.enabled = :enabled')
-            ->setParameter('enabled', true)
-            ->orderBy('u.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Count users by role
-     */
-    public function countUsersByRole(string $roleName): int
-    {
-        return (int) $this->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->innerJoin('u.role', 'r')
-            ->where('r.name = :roleName')
-            ->andWhere('r.enabled = :enabled')
-            ->andWhere('u.enabled = :enabled')
-            ->setParameter('roleName', $roleName)
-            ->setParameter('enabled', true)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    public function save(User $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(User $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
 }

@@ -9,9 +9,7 @@ use Knp\DoctrineBehaviors\Contract\Entity\UuidableInterface;
 use Knp\DoctrineBehaviors\Model\Uuidable\UuidableTrait;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
-use OroMediaLab\NxCoreBundle\Repository\RoleRepository;
-
-#[ORM\Entity(repositoryClass: RoleRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: "role")]
 class Role implements UuidableInterface, TimestampableInterface
 {

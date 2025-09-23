@@ -64,12 +64,3 @@ services:
     OroMediaLab\NxCoreBundle\Repository\KeyValueRepository:
         tags:
             - { name: doctrine.repository_service }
-    OroMediaLab\NxCoreBundle\Repository\RoleRepository:
-        tags:
-            - { name: doctrine.repository_service }
-    nxcore.service.acl:
-        class: OroMediaLab\NxCoreBundle\Service\AclService
-        arguments:
-            $tokenStorage: '@security.token_storage'
-            $userRepository: '@OroMediaLab\NxCoreBundle\Repository\UserRepository'
-            $roleRepository: '@OroMediaLab\NxCoreBundle\Repository\RoleRepository'

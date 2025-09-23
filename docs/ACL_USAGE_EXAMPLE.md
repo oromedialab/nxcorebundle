@@ -1,14 +1,30 @@
 # ACL System Usage Example
 
-This document shows how to use the ACL system in your project (e.g., cosko-api).
+This document shows how to use the ACL entities provided by NxCoreBundle in your project (e.g., cosko-api).
 
 ## Overview
 
-The ACL system now stores permissions directly in the database within the `Role` entity. This allows for dynamic permission management where admins can assign specific permissions to roles through your admin interface.
+The NxCoreBundle provides `Role` and enhanced `User` entities with ACL support. The Role entity stores permissions as JSON arrays, allowing for flexible permission management. **Following YAGNI principles, only entities are provided - you implement the services and logic in your consuming application.**
 
-## 1. Define Permissions Enum in Your Project
+## 1. Available Entities
 
-Create a Permission enum in your project to define all available permissions:
+### Role Entity
+- `id` - Primary key
+- `uuid` - UUID identifier  
+- `name` - Role name (unique)
+- `description` - Optional description
+- `enabled` - Boolean flag
+- `permissions` - JSON array of permission strings
+- `created_at` / `updated_at` - Timestamps
+
+### User Entity (Enhanced)
+- All existing User properties
+- `role` - ManyToOne relationship to Role entity
+- Added methods: `getRole()`, `setRole()`, `hasRole()`
+
+## 2. Define Permissions in Your Project
+
+Create a Permission enum to define your application permissions:
 
 ```php
 <?php
@@ -17,62 +33,25 @@ namespace App\Security;
 
 enum Permission: string
 {
-    // Technician management
     case CREATE_TECHNICIAN = 'create_technician';
     case EDIT_TECHNICIAN = 'edit_technician';
     case DELETE_TECHNICIAN = 'delete_technician';
     case VIEW_TECHNICIAN = 'view_technician';
-
-    // Wallet management
     case MANAGE_WALLET = 'manage_wallet';
     case VIEW_WALLET = 'view_wallet';
 
-    // Leads management
-    case MANAGE_LEADS = 'manage_leads';
-    case VIEW_LEADS = 'view_leads';
-    case ASSIGN_LEADS = 'assign_leads';
-
-    public function key(): string
-    {
-        return $this->value;
-    }
-
-    public function name(): string
+    public function label(): string
     {
         return match($this) {
             self::CREATE_TECHNICIAN => 'Create Technician',
-            self::EDIT_TECHNICIAN => 'Edit Technician',
+            self::EDIT_TECHNICIAN => 'Edit Technician', 
             self::DELETE_TECHNICIAN => 'Delete Technician',
             self::VIEW_TECHNICIAN => 'View Technician',
             self::MANAGE_WALLET => 'Manage Wallet',
             self::VIEW_WALLET => 'View Wallet',
-            self::MANAGE_LEADS => 'Manage Leads',
-            self::VIEW_LEADS => 'View Leads',
-            self::ASSIGN_LEADS => 'Assign Leads',
         };
     }
 
-    public function group(): string
-    {
-        return match(true) {
-            str_starts_with($this->value, 'create_technician') => 'Technician Management',
-            str_starts_with($this->value, 'edit_technician') => 'Technician Management',
-            str_starts_with($this->value, 'delete_technician') => 'Technician Management',
-            str_starts_with($this->value, 'view_technician') => 'Technician Management',
-            str_contains($this->value, 'wallet') => 'Wallet Management',
-            str_contains($this->value, 'leads') => 'Leads Management',
-            default => 'Other',
-        };
-    }
-
-    public function description(): string
-    {
-        return '';
-    }
-
-    /**
-     * Get all available permissions as array (useful for admin interfaces)
-     */
     public static function getAllPermissions(): array
     {
         return array_map(fn(Permission $p) => $p->value, self::cases());
@@ -80,314 +59,374 @@ enum Permission: string
 }
 ```
 
-## 2. Managing Role Permissions
+## 3. Managing Roles and Permissions
 
-With the new system, permissions are stored directly in the database within the `Role` entity. You can manage them through your admin interface or programmatically:
-
-### Programmatic Permission Management:
+### Creating Roles Programmatically
 
 ```php
 <?php
-// Example: Setting up roles with permissions in a command or fixture
-
+// In a fixture or command
 use OroMediaLab\NxCoreBundle\Entity\Role;
 use App\Security\Permission;
 
-// Create roles with permissions
+// Create admin role with all permissions
 $adminRole = new Role();
 $adminRole->setName('admin')
-    ->setDescription('Administrator role')
-    ->setPermissions(Permission::getAllPermissions()); // All permissions
+    ->setDescription('Administrator with all permissions')
+    ->setPermissions(Permission::getAllPermissions());
 
+// Create manager role with specific permissions
 $managerRole = new Role();
 $managerRole->setName('manager')
-    ->setDescription('Manager role')
+    ->setDescription('Manager role') 
     ->setPermissions([
         Permission::CREATE_TECHNICIAN->value,
         Permission::EDIT_TECHNICIAN->value,
         Permission::VIEW_TECHNICIAN->value,
-        Permission::MANAGE_LEADS->value,
-        Permission::VIEW_LEADS->value,
-        Permission::ASSIGN_LEADS->value,
-        Permission::VIEW_WALLET->value,
+        Permission::MANAGE_WALLET->value,
     ]);
 
-$technicianRole = new Role();
-$technicianRole->setName('technician')
-    ->setDescription('Technician role')
-    ->setPermissions([
-        Permission::VIEW_TECHNICIAN->value,
-        Permission::VIEW_LEADS->value,
-        Permission::VIEW_WALLET->value,
-    ]);
-
-// Save roles
 $entityManager->persist($adminRole);
 $entityManager->persist($managerRole);
-$entityManager->persist($technicianRole);
 $entityManager->flush();
 ```
 
-### Dynamic Permission Management:
+### API Endpoints for Role Management
 
-```php
-<?php
-// Adding/removing permissions from roles dynamically
+#### POST /api/v1/roles - Create Role
 
-// Set permissions for a role (replaces existing permissions)
-$role = $roleRepository->findOneBy(['name' => 'manager']);
-$role->setPermissions([
-    Permission::VIEW_TECHNICIAN->value,
-    Permission::EDIT_TECHNICIAN->value,
-    Permission::MANAGE_LEADS->value,
-]);
-$entityManager->flush();
-
-// Add more permissions to existing ones
-$existingPermissions = $role->getPermissions();
-$newPermissions = array_merge($existingPermissions, [
-    Permission::DELETE_TECHNICIAN->value,
-    Permission::MANAGE_WALLET->value,
-]);
-$role->setPermissions(array_unique($newPermissions));
-$entityManager->flush();
-
-// Remove specific permissions
-$existingPermissions = $role->getPermissions();
-$permissionsToRemove = [
-    Permission::DELETE_TECHNICIAN->value,
-    Permission::MANAGE_WALLET->value,
-];
-$filteredPermissions = array_diff($existingPermissions, $permissionsToRemove);
-$role->setPermissions(array_values($filteredPermissions));
-$entityManager->flush();
-
-// Check if role has a specific permission
-if ($role->hasPermission(Permission::CREATE_TECHNICIAN->value)) {
-    // Role has this permission
-}
-
-// Check multiple permissions at once - returns array of bool results
-$permissionResults = $role->hasPermission([
-    Permission::EDIT_TECHNICIAN->value,
-    Permission::DELETE_TECHNICIAN->value,
-    Permission::VIEW_TECHNICIAN->value,
-]);
-// $permissionResults = [true, false, true] for example
-
-// Check if role has any of the given permissions
-$checkPermissions = [
-    Permission::EDIT_TECHNICIAN->value,
-    Permission::DELETE_TECHNICIAN->value,
-];
-$results = $role->hasPermission($checkPermissions);
-if (in_array(true, $results)) {
-    // Role has at least one of these permissions
-}
-
-// Check if role has all of the given permissions
-$checkPermissions = [
-    Permission::VIEW_TECHNICIAN->value,
-    Permission::EDIT_TECHNICIAN->value,
-];
-$results = $role->hasPermission($checkPermissions);
-if (!in_array(false, $results)) {
-    // Role has all of these permissions
-}
-```
-
-## 3. Usage in Controllers
-
-```php
-<?php
-// In your controller
-namespace App\Controller;
-
-use App\Security\Permission;
-use OroMediaLab\NxCoreBundle\Service\AclService;
-use Symfony\Component\HttpFoundation\Response;
-
-class TechnicianController extends AbstractController
+```json
+// Request
 {
-    public function __construct(
-        private AclService $aclService
-    ) {
-    }
+    "name": "supervisor",
+    "description": "Supervisor role",
+    "permissions": [
+        "view_technician",
+        "edit_technician",
+        "view_wallet"
+    ],
+    "enabled": true
+}
 
-    public function createTechnician(): Response
-    {
-        // Method 1: Check permission manually
-        if (!$this->aclService->hasPermission(Permission::CREATE_TECHNICIAN->value)) {
-            throw $this->createAccessDeniedException('You cannot create technicians');
-        }
-
-        // Method 2: Using denyAccessUnlessGranted (throws exception automatically)
-        $this->aclService->denyAccessUnlessGranted(Permission::CREATE_TECHNICIAN->value);
-
-        // Your logic here
-        return new Response('Technician created');
-    }
-
-    public function listTechnicians(): Response
-    {
-        // Check permission
-        $this->aclService->denyAccessUnlessGranted(Permission::VIEW_TECHNICIAN->value);
-
-        // Your logic here
-        return new Response('Technician list');
-    }
-
-    public function manageTechnician(): Response
-    {
-        // Check multiple permissions (user needs ANY of these)
-        if (!$this->aclService->hasAnyPermission([
-            Permission::EDIT_TECHNICIAN->value,
-            Permission::DELETE_TECHNICIAN->value,
-        ])) {
-            throw $this->createAccessDeniedException('Insufficient permissions');
-        }
-
-        // Check multiple permissions (user needs ALL of these)
-        if (!$this->aclService->hasAllPermissions([
-            Permission::VIEW_TECHNICIAN->value,
-            Permission::EDIT_TECHNICIAN->value,
-        ])) {
-            throw $this->createAccessDeniedException('You need both view and edit permissions');
-        }
-
-        // Your logic here
-        return new Response('Manage technician');
-    }
-
-    public function getUserPermissions(): Response
-    {
-        // Get all permissions for current user
-        $permissions = $this->aclService->getCurrentUserPermissions();
-        
-        return $this->json(['permissions' => $permissions]);
-    }
-
-    public function checkMultiplePermissions(): Response
-    {
-        // Check multiple permissions at once - get detailed results
-        $permissionsToCheck = [
-            Permission::CREATE_TECHNICIAN->value,
-            Permission::EDIT_TECHNICIAN->value,
-            Permission::DELETE_TECHNICIAN->value,
-            Permission::VIEW_WALLET->value,
-        ];
-        
-        $results = $this->aclService->getPermissionResults($permissionsToCheck);
-        
-        // $results = [true, true, false, false] for example
-        return $this->json([
-            'permission_results' => array_combine($permissionsToCheck, $results)
-        ]);
+// Response
+{
+    "success": true,
+    "data": {
+        "id": 123,
+        "uuid": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "supervisor",
+        "description": "Supervisor role",
+        "permissions": [
+            "view_technician",
+            "edit_technician", 
+            "view_wallet"
+        ],
+        "enabled": true,
+        "created": "2024-01-01T12:00:00Z",
+        "updated": "2024-01-01T12:00:00Z"
     }
 }
 ```
 
-## 4. Usage in Twig Templates
+#### PUT /api/v1/roles/{uuid} - Update Role
 
-Register the AclService as accessible in Twig:
+```json
+// Request
+{
+    "description": "Updated supervisor role",
+    "permissions": [
+        "view_technician",
+        "edit_technician",
+        "delete_technician",
+        "view_wallet",
+        "manage_wallet"
+    ],
+    "enabled": true
+}
 
-```yaml
-# config/services.yaml in your project
-services:
-    # ... other services
-
-    # Make AclService available in Twig
-    app.twig_extension.acl:
-        class: App\Twig\AclExtension
-        arguments:
-            - '@nxcore.service.acl'
-        tags:
-            - { name: twig.extension }
+// Response
+{
+    "success": true,
+    "data": {
+        "id": 123,
+        "uuid": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "supervisor",
+        "description": "Updated supervisor role", 
+        "permissions": [
+            "view_technician",
+            "edit_technician",
+            "delete_technician",
+            "view_wallet",
+            "manage_wallet"
+        ],
+        "enabled": true,
+        "created": "2024-01-01T12:00:00Z",
+        "updated": "2024-01-01T15:30:00Z"
+    }
+}
 ```
+
+#### PUT /api/v1/users/{uuid} - Assign Role to User
+
+```json
+// Request
+{
+    "name": "John Doe",
+    "email_address": "john@example.com",
+    "role_uuid": "550e8400-e29b-41d4-a716-446655440000",
+    "enabled": true
+}
+
+// Response
+{
+    "success": true,
+    "data": {
+        "id": 456,
+        "uuid": "123e4567-e89b-12d3-a456-426614174000",
+        "username": "john_doe",
+        "name": "John Doe",
+        "email_address": "john@example.com",
+        "enabled": true,
+        "role": {
+            "id": 123,
+            "uuid": "550e8400-e29b-41d4-a716-446655440000",
+            "name": "supervisor",
+            "description": "Supervisor role",
+            "enabled": true,
+            "permissions": [
+                "view_technician",
+                "edit_technician",
+                "view_wallet"
+            ],
+            "created": "2024-01-01T12:00:00Z",
+            "updated": "2024-01-01T12:00:00Z"
+        },
+        "created": "2024-01-01T10:00:00Z"
+    }
+}
+```
+
+## 4. Implementing Permission Logic in Your Application
+
+Since NxCoreBundle only provides entities, implement your own permission checking logic:
+
+### Custom Permission Service
 
 ```php
 <?php
-// src/Twig/AclExtension.php
-namespace App\Twig;
+// src/Service/PermissionService.php
+namespace App\Service;
 
-use OroMediaLab\NxCoreBundle\Service\AclService;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use OroMediaLab\NxCoreBundle\Entity\User;
+use Symfony\Component\Security\Core\Security;
 
-class AclExtension extends AbstractExtension
+class PermissionService
 {
-    public function __construct(
-        private AclService $aclService
-    ) {
-    }
-
-    public function getFunctions(): array
+    public function __construct(private Security $security)
     {
-        return [
-            new TwigFunction('has_permission', [$this, 'hasPermission']),
-            new TwigFunction('has_any_permission', [$this, 'hasAnyPermission']),
-            new TwigFunction('has_all_permissions', [$this, 'hasAllPermissions']),
-            new TwigFunction('has_role', [$this, 'hasRole']),
-            new TwigFunction('user_permissions', [$this, 'getUserPermissions']),
-        ];
     }
 
     public function hasPermission(string $permission): bool
     {
-        return $this->aclService->hasPermission($permission);
+        $user = $this->security->getUser();
+        
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        $role = $user->getRole(false);
+        
+        if (!$role || !$role->isEnabled() || !$user->isEnabled()) {
+            return false;
+        }
+
+        return $role->hasPermission($permission);
     }
 
     public function hasAnyPermission(array $permissions): bool
     {
-        return $this->aclService->hasAnyPermission($permissions);
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function hasAllPermissions(array $permissions): bool
     {
-        return $this->aclService->hasAllPermissions($permissions);
-    }
-
-    public function hasRole(string $role): bool
-    {
-        return $this->aclService->hasRole($role);
-    }
-
-    public function getUserPermissions(): array
-    {
-        return $this->aclService->getCurrentUserPermissions();
+        foreach ($permissions as $permission) {
+            if (!$this->hasPermission($permission)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 ```
 
-Then in Twig:
+### Using in Controllers
 
-```twig
-{# templates/technician/list.html.twig #}
-{% if has_permission('create_technician') %}
-    <a href="{{ path('technician_create') }}" class="btn btn-primary">
-        Create Technician
-    </a>
-{% endif %}
+```php
+<?php
+// src/Controller/TechnicianController.php
+namespace App\Controller;
 
-{# Check multiple permissions - user needs ANY #}
-{% if has_any_permission(['edit_technician', 'delete_technician']) %}
-    <div class="management-tools">
-        <!-- Show management tools -->
-    </div>
-{% endif %}
+use App\Security\Permission;
+use App\Service\PermissionService;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-{# Check multiple permissions - user needs ALL #}
-{% if has_all_permissions(['view_technician', 'edit_technician']) %}
-    <a href="{{ path('technician_edit') }}" class="btn btn-warning">
-        Edit Technician
-    </a>
-{% endif %}
+class TechnicianController extends AbstractController
+{
+    public function __construct(private PermissionService $permissionService)
+    {
+    }
 
-{% if has_role('admin') %}
-    <div class="admin-panel">
-        <!-- Admin-only content -->
-    </div>
-{% endif %}
+    public function create(): Response
+    {
+        if (!$this->permissionService->hasPermission(Permission::CREATE_TECHNICIAN->value)) {
+            throw $this->createAccessDeniedException('Cannot create technicians');
+        }
+
+        // Your logic here
+        return $this->json(['message' => 'Technician created']);
+    }
+
+    public function list(): Response
+    {
+        if (!$this->permissionService->hasPermission(Permission::VIEW_TECHNICIAN->value)) {
+            throw $this->createAccessDeniedException('Cannot view technicians');
+        }
+
+        // Your logic here
+        return $this->json(['technicians' => []]);
+    }
+}
+```
+
+## 5. Using Symfony Voters for Advanced Authorization
+
+Create voters that integrate with your Role and Permission system for complex authorization:
+
+### Permission-Based Voter
+
+```php
+<?php
+// src/Security/Voter/PermissionVoter.php
+namespace App\Security\Voter;
+
+use App\Security\Permission;
+use OroMediaLab\NxCoreBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+class PermissionVoter extends Voter
+{
+    protected function supports(string $attribute, mixed $subject): bool
+    {
+        // Support all Permission enum values
+        return in_array($attribute, Permission::getAllPermissions());
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    {
+        $user = $token->getUser();
+        
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        $role = $user->getRole(false);
+        
+        if (!$role || !$role->isEnabled() || !$user->isEnabled()) {
+            return false;
+        }
+
+        // Use Role entity's hasPermission method
+        return $role->hasPermission($attribute);
+    }
+}
+```
+
+### Using Voters in Controllers
+
+```php
+<?php
+// src/Controller/TechnicianController.php
+namespace App\Controller;
+
+use App\Security\Permission;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+
+class TechnicianController extends AbstractController
+{
+    public function create(): Response
+    {
+        // Use Symfony's built-in authorization with your voter
+        $this->denyAccessUnlessGranted(Permission::CREATE_TECHNICIAN->value);
+
+        // Your logic here
+        return $this->json(['message' => 'Technician created']);
+    }
+
+    public function edit(int $id): Response
+    {
+        $this->denyAccessUnlessGranted(Permission::EDIT_TECHNICIAN->value);
+        
+        // Your logic here
+        return $this->json(['message' => 'Technician updated']);
+    }
+
+    public function delete(int $id): Response
+    {
+        $this->denyAccessUnlessGranted(Permission::DELETE_TECHNICIAN->value);
+        
+        // Your logic here
+        return $this->json(['message' => 'Technician deleted']);
+    }
+}
+```
+
+## 6. Database Setup
+
+Create and run migrations to add the Role table:
+
+```bash
+# Generate migration for the new Role entity
+php bin/console make:migration
+
+# Run migration
+php bin/console doctrine:migrations:migrate
+```
+
+## 7. Summary
+
+### What NxCoreBundle Provides:
+- **Role Entity**: Stores roles with permissions as JSON arrays
+- **Enhanced User Entity**: Added role relationship and related methods
+- **UserRepository fetchAll**: Returns users with complete role information
+
+### What You Implement in Your Application:
+- **Permission Enum**: Define your application-specific permissions
+- **Permission Services**: Create services for checking permissions
+- **Voters**: Implement Symfony voters for complex authorization
+- **API Controllers**: Build REST endpoints for role/permission management
+- **Business Logic**: Add your specific authorization rules
+
+### Key Benefits:
+- **YAGNI Compliant**: Only provides essential entities, not unused services
+- **Flexible**: JSON permission storage adapts to any permission structure
+- **Symfony Integration**: Works seamlessly with Symfony's security system
+- **Extensible**: Easy to extend with additional authorization logic
+
+### Usage Pattern:
+1. Define permissions in your app using enums
+2. Create roles and assign permissions via API or fixtures
+3. Use Role entity's `hasPermission()` method for basic checks
+4. Implement voters for complex authorization logic
+5. UserRepository's `fetchAll()` provides complete user+role data for admin interfaces
 
 {# Display user's permissions for debugging or admin interface #}
 {% if has_role('admin') %}
