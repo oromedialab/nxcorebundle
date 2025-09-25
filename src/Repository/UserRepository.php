@@ -86,8 +86,8 @@ class UserRepository extends ServiceEntityRepository
             $item['email_address'] = $row->getEmailAddress();
             $item['contact_number'] = $row->getContactNumber();
             $item['enabled'] = $row->isEnabled();
-            // Include role information
-            $userRole = $row->getRole(false); // Get Role object
+            $item['role'] = [];
+            $userRole = $row->getRole(false);
             if ($userRole) {
                 $item['role'] = [
                     'id' => $userRole->getId(),
@@ -99,8 +99,6 @@ class UserRepository extends ServiceEntityRepository
                     'created' => $userRole->getCreatedAt()->format(\DateTime::RFC3339),
                     'updated' => $userRole->getUpdatedAt()->format(\DateTime::RFC3339)
                 ];
-            } else {
-                $item['role'] = null;
             }
             $item['created'] = $row->getCreatedAt()->format(\DateTime::RFC3339);
             $items[] = $item;

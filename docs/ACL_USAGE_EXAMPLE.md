@@ -245,22 +245,64 @@ class PermissionService
 
     public function hasAnyPermission(array $permissions): bool
     {
-        foreach ($permissions as $permission) {
-            if ($this->hasPermission($permission)) {
-                return true;
-            }
+        $user = $this->security->getUser();
+        
+        if (!$user instanceof User) {
+            return false;
         }
-        return false;
+
+        $role = $user->getRole(false);
+        
+        if (!$role || !$role->isEnabled() || !$user->isEnabled()) {
+            return false;
+        }
+
+        // Using Role's hasPermissions method for efficient bulk checking
+        $results = $role->hasPermissions($permissions);
+        return in_array(true, $results);
     }
 
     public function hasAllPermissions(array $permissions): bool
     {
-        foreach ($permissions as $permission) {
-            if (!$this->hasPermission($permission)) {
-                return false;
-            }
+        $user = $this->security->getUser();
+        
+        if (!$user instanceof User) {
+            return false;
         }
-        return true;
+
+        $role = $user->getRole(false);
+        
+        if (!$role || !$role->isEnabled() || !$user->isEnabled()) {
+            return false;
+        }
+
+        // Using Role's hasPermissions method for efficient bulk checking
+        $results = $role->hasPermissions($permissions);
+        return !in_array(false, $results);
+    }
+
+    /**
+     * Example showing different ways to check permissions
+     */
+    public function checkPermissionsExample(User $user): array
+    {
+        $role = $user->getRole(false);
+        
+        if (!$role || !$role->isEnabled()) {
+            return [];
+        }
+
+        // Single permission check
+        $canCreateTechnician = $role->hasPermission('create_technician');
+        
+        // Multiple permission checks
+        $permissionsToCheck = ['view_technician', 'edit_technician', 'delete_technician'];
+        $permissionResults = $role->hasPermissions($permissionsToCheck);
+        
+        return [
+            'can_create_technician' => $canCreateTechnician,
+            'permission_details' => array_combine($permissionsToCheck, $permissionResults)
+        ];
     }
 }
 ```
@@ -424,9 +466,10 @@ php bin/console doctrine:migrations:migrate
 ### Usage Pattern:
 1. Define permissions in your app using enums
 2. Create roles and assign permissions via API or fixtures
-3. Use Role entity's `hasPermission()` method for basic checks
-4. Implement voters for complex authorization logic
-5. UserRepository's `fetchAll()` provides complete user+role data for admin interfaces
+3. Use Role entity's `hasPermission()` method for single permission checks
+4. Use Role entity's `hasPermissions()` method for checking multiple permissions at once
+5. Implement voters for complex authorization logic
+6. UserRepository's `fetchAll()` provides complete user+role data for admin interfaces
 
 {# Display user's permissions for debugging or admin interface #}
 {% if has_role('admin') %}

@@ -44,7 +44,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     #[ORM\Column(type: 'boolean')]
     private bool $enabled = true;
 
-    #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\ManyToOne(targetEntity: Role::class, nullable: false)]
     private Role $role;
 
     public function getId(): ?int
@@ -148,7 +148,7 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         return $this->role;
     }
 
-    public function setRole(?Role $role): self
+    public function setRole(Role $role): self
     {
         $this->role = $role;
         return $this;

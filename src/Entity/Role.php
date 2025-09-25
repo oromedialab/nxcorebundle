@@ -9,6 +9,7 @@ use Knp\DoctrineBehaviors\Contract\Entity\UuidableInterface;
 use Knp\DoctrineBehaviors\Model\Uuidable\UuidableTrait;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
+
 #[ORM\Entity]
 #[ORM\Table(name: "role")]
 class Role implements UuidableInterface, TimestampableInterface
@@ -82,22 +83,23 @@ class Role implements UuidableInterface, TimestampableInterface
         return $this;
     }
 
-    public function hasPermission(string|array $permissions): bool|array
+    public function hasPermission(string $permission): bool
     {
         $currentPermissions = $this->getPermissions();
-        
-        if (is_string($permissions)) {
-            return in_array($permissions, $currentPermissions, true);
-        }
-        
+        return in_array($permission, $currentPermissions, true);
+    }
+
+    public function hasPermissions(array $permissions): array
+    {
+        $currentPermissions = $this->getPermissions();
         $results = [];
+        
         foreach ($permissions as $permission) {
             $results[] = in_array($permission, $currentPermissions, true);
         }
         
         return $results;
     }
-
 
     public function __toString(): string
     {
