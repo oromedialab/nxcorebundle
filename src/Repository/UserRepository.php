@@ -86,7 +86,20 @@ class UserRepository extends ServiceEntityRepository
             $item['email_address'] = $row->getEmailAddress();
             $item['contact_number'] = $row->getContactNumber();
             $item['enabled'] = $row->isEnabled();
-            $item['role'] = $row->getRoles()[0];
+            $item['role'] = [];
+            $userRole = $row->getRole(false);
+            if ($userRole) {
+                $item['role'] = [
+                    'id' => $userRole->getId(),
+                    'uuid' => (string)$userRole->getUuid(),
+                    'name' => $userRole->getName(),
+                    'description' => $userRole->getDescription(),
+                    'enabled' => $userRole->isEnabled(),
+                    'permissions' => $userRole->getPermissions(),
+                    'created' => $userRole->getCreatedAt()->format(\DateTime::RFC3339),
+                    'updated' => $userRole->getUpdatedAt()->format(\DateTime::RFC3339)
+                ];
+            }
             $item['created'] = $row->getCreatedAt()->format(\DateTime::RFC3339);
             $items[] = $item;
         }
@@ -129,4 +142,5 @@ class UserRepository extends ServiceEntityRepository
             ]
         ];
     }
+
 }
