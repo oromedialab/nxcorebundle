@@ -159,7 +159,6 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
         if (!$this->role || !$this->role->isEnabled()) {
             return false;
         }
-        
         return strtolower($this->role->getName()) === strtolower($roleName);
     }
 }
