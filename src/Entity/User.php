@@ -44,7 +44,8 @@ class User implements UuidableInterface, TimestampableInterface, PasswordAuthent
     #[ORM\Column(type: 'boolean')]
     private bool $enabled = true;
 
-    #[ORM\ManyToOne(targetEntity: Role::class, nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private Role $role;
 
     public function getId(): ?int
