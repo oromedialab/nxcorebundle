@@ -12,6 +12,7 @@ use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 
 #[ORM\Entity]
 #[ORM\Table(name: "role")]
+#[ORM\InheritanceType('SINGLE_TABLE')]
 class Role implements UuidableInterface, TimestampableInterface
 {
     use UuidableTrait;
