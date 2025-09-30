@@ -11,7 +11,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OroMediaLab\NxCoreBundle\Entity\User;
-use OroMediaLab\NxCoreBundle\Entity\UserAdmin;
 use OroMediaLab\NxCoreBundle\Entity\Role;
 
 #[AsCommand(name: 'app:user:create')]
@@ -105,8 +104,8 @@ class UserCreateCommand extends Command
         });
         $contactNumber = $helper->ask($input, $output, $question);
         
-        // Create User Entity
-        $user = new UserAdmin();
+        // Create User Entity - using base User since UserAdmin is redundant with new Role system
+        $user = new User();
         $user->setRole($adminRole);  // Set the Role entity instead of string
         $user->setUsername($username);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
