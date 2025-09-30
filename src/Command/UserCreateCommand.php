@@ -32,11 +32,11 @@ class UserCreateCommand extends Command
         $helper = $this->getHelper('question');
         
         // Check if admin role exists, create if not
-        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['name' => 'admin']);
+        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['name' => 'ROLE_ADMIN']);
         if (!$adminRole) {
             $output->writeln('<info>Creating admin role with super_admin permission...</info>');
             $adminRole = new Role();
-            $adminRole->setName('admin')
+            $adminRole->setName('ROLE_ADMIN')
                      ->setDescription('Administrator role with full system access')
                      ->setPermissions(['super_admin'])
                      ->setEnabled(true);
