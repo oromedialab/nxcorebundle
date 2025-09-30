@@ -11,7 +11,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OroMediaLab\NxCoreBundle\Entity\User;
-use OroMediaLab\NxCoreBundle\Entity\UserAdmin;
+use OroMediaLab\NxCoreBundle\Entity\Role;
 
 #[AsCommand(name: 'app:user:create')]
 class UserCreateCommand extends Command
@@ -30,13 +30,18 @@ class UserCreateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $helper = $this->getHelper('question');
-        // User Role
-        $question = new ChoiceQuestion(
-            'Select User Role',
-            ['ROLE_ADMIN'],
-            0
-        );
-        $role = $helper->ask($input, $output, $question);
+        
+        // Check if admin role exists, create if not
+        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['name' => 'admin']);
+        if (!$adminRole) {
+            $output->writeln('<info>Creating admin role with super_admin permission...</info>');
+            $adminRole = new Role();
+            $adminRole->setName('admin')
+                     ->setDescription('Administrator role with full system access')
+                     ->setPermissions(['super_admin'])
+                     ->setEnabled(true);
+            $this->em->persist($adminRole);
+        }
         // Username
         $question = new Question('Username: ');
         $question->setValidator(function ($answer) {
@@ -98,16 +103,22 @@ class UserCreateCommand extends Command
             return $answer;
         });
         $contactNumber = $helper->ask($input, $output, $question);
-        // User Entity
-        $user = new UserAdmin();
-        $user->setRole($role);
+        
+        $user = new User();
+        $user->setRole($adminRole);
         $user->setUsername($username);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
         $user->setName($name);
         $user->setEmailAddress($emailAddress);
         $user->setContactNumber($contactNumber);
+        
         $this->em->persist($user);
         $this->em->flush();
+        
+        $output->writeln('<success>Admin user created successfully!</success>');
+        $output->writeln(sprintf('<info>Username: %s</info>', $username));
+        $output->writeln(sprintf('<info>Role: %s (%s)</info>', $adminRole->getName(), implode(', ', $adminRole->getPermissions())));
+        
         return Command::SUCCESS;
     }
 }
