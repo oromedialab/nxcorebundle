@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OroMediaLab\NxCoreBundle\Entity\User;
 use OroMediaLab\NxCoreBundle\Entity\Role;
+use OroMediaLab\NxCoreBundle\Entity\UserAdmin;
 
 #[AsCommand(name: 'app:user:create')]
 class UserCreateCommand extends Command
@@ -104,7 +105,7 @@ class UserCreateCommand extends Command
         });
         $contactNumber = $helper->ask($input, $output, $question);
         
-        $user = new User();
+        $user = new UserAdmin();
         $user->setRole($adminRole);
         $user->setUsername($username);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
