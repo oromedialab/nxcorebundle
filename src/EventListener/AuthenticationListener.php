@@ -30,7 +30,7 @@ class AuthenticationListener
         if ($user instanceof \OroMediaLab\NxCoreBundle\Entity\User) {
             $role = $user->getRole(false);
             if ($role && $role->isEnabled()) {
-                $roleName = 'ROLE_' . strtoupper($role->getName());
+                $roleName = strtoupper($role->getName());
                 $roleUuid = $role->getUuid();
             }
         }
