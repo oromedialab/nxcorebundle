@@ -23,9 +23,22 @@ class AuthenticationListener
         if (!$user instanceof UserInterface) {
             return;
         }
+        
+        $roleName = 'ROLE_USER';
+        $roleUuid = null;
+        
+        if ($user instanceof \OroMediaLab\NxCoreBundle\Entity\User) {
+            $role = $user->getRole(false);
+            if ($role && $role->isEnabled()) {
+                $roleName = strtoupper($role->getName());
+                $roleUuid = $role->getUuid();
+            }
+        }
+        
         $data = [
             'name' => $user->getName(),
-            'role' => !empty($user->getRoles()[0]) ? $user->getRoles()[0] : 'ROLE_USER',
+            'role' => $roleName,
+            'role_uuid' => $roleUuid,
             'jwt_token' => $event->getData()['token']
         ];
         $event->setData(ApiResponse::body(ApiResponseCode::AUTH_SUCCESSFUL, $data));
