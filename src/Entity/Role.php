@@ -10,6 +10,7 @@ use Knp\DoctrineBehaviors\Model\Uuidable\UuidableTrait;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 
+
 #[ORM\Entity]
 #[ORM\Table(name: "role")]
 #[ORM\InheritanceType('SINGLE_TABLE')]
