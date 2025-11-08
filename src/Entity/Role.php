@@ -15,7 +15,7 @@ use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 #[ORM\Table(name: "role")]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'dtype', type: 'string')]
-#[ORM\DiscriminatorMap(['role' => 'OroMediaLab\NxCoreBundle\Entity\Role', 'app_role' => 'App\Entity\Role'])]
+#[ORM\DiscriminatorMap(['role' => 'OroMediaLab\NxCoreBundle\Entity\Role'])]
 class Role implements UuidableInterface, TimestampableInterface
 {
     use UuidableTrait;
