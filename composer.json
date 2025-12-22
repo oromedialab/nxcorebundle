@@ -35,7 +35,7 @@
         "knplabs/doctrine-behaviors": "^3.0",
         "symfony/yaml": "^7.0.3",
         "symfony/dotenv": "^7.0.4",
-        "lexik/jwt-authentication-bundle": "^2.20.3",
+        "lexik/jwt-authentication-bundle": "^2.21 || ^3.2",
         "aws/aws-sdk-php": "^3.300",
         "symfony/mime": "^7.0.3",
         "symfony/google-mailer": "^7.0.3",
