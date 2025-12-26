@@ -10,5 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorMap(['admin' => 'UserAdmin'])]
 class UserAdmin extends User
 {
-    // Role is now handled by the Role entity relationship in parent User class
+    protected $role = 'ROLE_ADMIN';
+
+    public function getRoles(): array
+    {
+        return ['ROLE_ADMIN', 'ROLE_USER'];
+    }
 }
